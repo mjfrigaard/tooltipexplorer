@@ -2,7 +2,7 @@ Package: tooltipexplorer
 Title: Tooltip and Hover-Info Explorer
 Version: 0.0.1
 Authors@R: 
-    person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+    person("Martin", "Frigaard", , "mjfrigaard@pm.me", role = c("aut", "cre"))
 Description: A Shiny application for demoing and exploring tooltip and 
     hover-info options in R using financial data from tidyfinance and tidyquant.
 License: MIT + file LICENSE
@@ -29,7 +29,12 @@ Imports:
     rmarkdown,
     knitr,
     glue,
+    jsonlite,
+    logger,
     lubridate,
     scales,
-    slider
+    slider,
+    shinyalert,
+    shinyhelper,
+    prompter
 VignetteBuilder: knitr

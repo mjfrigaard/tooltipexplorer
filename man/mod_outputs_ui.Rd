@@ -11,7 +11,7 @@ mod_outputs_ui(id)
 }
 \description{
 Main content area: KPI value boxes and tabbed panels for each
-tooltip/hover demo (plotly, tippy, bslib, reactable, gt, DT, rolling vol).
+tooltip/hover demo (bslib, shinyhelper, prompter, shinyalert, reactable).
 }
 \section{UI}{
 
@@ -24,7 +24,9 @@ the demo panels.
 
 \code{mod_outputs_server()} reacts to the fetch signal from
 \code{\link[=mod_inputs_server]{mod_inputs_server()}}, downloads price data, computes returns and
-volatility, and renders all tooltip-demo outputs.  Returns the reactive
-performance-summary tibble (\code{perf_r}) for the download module.
+performance metrics, and renders all tooltip-demo outputs.  Calls
+\code{shinyhelper::observe_helpers()} internally — do not call it separately
+in \code{app_server()}.  Returns the reactive performance-summary tibble
+(\code{perf_r}) for the download module.
 }
 

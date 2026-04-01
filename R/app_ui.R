@@ -6,59 +6,89 @@
 #' @return A `shiny.tag` UI object suitable for passing to [shiny::shinyApp()].
 #' @export
 app_ui <- function() {
-  bslib::page_sidebar(
-    title = shiny::tagList(
-      bsicons::bs_icon("bar-chart-steps"),
-      " Tooltip Explorer"
-    ),
-    theme = bslib::bs_theme(
-      version    = 5,
-      bootswatch = "flatly",
-      primary    = "#2c7bb6",
-      base_font  = bslib::font_google("Inter")
-    ),
-    fillable = FALSE,
 
-    # ── HEAD extras ─────────────────────────────────────────────────────────
-    shiny::tags$head(
-      # tippy.js CDN (CSS)
-      shiny::tags$link(
-        rel  = "stylesheet",
-        href = "https://unpkg.com/tippy.js@6/dist/tippy.css"
+  logger::log_info(
+    "Building app UI",
+    namespace = "tooltipexplorer/app"
+  )
+
+  with_logging(
+    context = "app_ui",
+    ns      = "tooltipexplorer/app",
+    bslib::page_sidebar(
+      title = shiny::tagList(
+        bsicons::bs_icon("bar-chart-steps"),
+        " Tooltip Explorer"
       ),
-      # Enable Bootstrap tooltips globally
-      shiny::tags$script(
-        "document.addEventListener('DOMContentLoaded', function () {",
-        "  var tooltipEls = [].slice.call(",
-        "    document.querySelectorAll('[data-bs-toggle=\"tooltip\"]')",
-        "  );",
-        "  tooltipEls.forEach(function (el) {",
-        "    new bootstrap.Tooltip(el);",
-        "  });",
-        "});"
-      )
-    ),
+      theme = bslib::bs_theme(
+        version    = 5,
+        bootswatch = "flatly",
+        primary    = "#2c7bb6",
+        base_font  = bslib::font_google("Inter")
+      ),
+      fillable = FALSE,
 
-    # ── Sidebar ──────────────────────────────────────────────────────────────
-    sidebar = mod_inputs_ui("inputs"),
+      # ── HEAD extras ─────────────────────────────────────────────────────
+      shiny::tags$head(
+        # Load shinyalert JS library unconditionally — required for the
+        # delegated .sa-trigger handler below, which calls shinyalert()
+        # directly from JS without going through the R server function.
+        shinyalert::useShinyalert(force = TRUE),
 
-    # ── Main content ──────────────────────────────────────────────────────────
-    bslib::layout_columns(
-      col_widths = c(9, 3),
+        # Delegated shinyalert handler — reads content from data-sa-* attrs.
+        # The browser dataset API decodes HTML entities automatically, so
+        # storing HTML in data-sa-text is safe and avoids onclick escaping.
+        shiny::tags$script(htmltools::HTML(
+          "$(document).on('click', '.sa-trigger', function () {",
+          "  var d = $(this).data();",
+          "  swal({",
+          "    title:            d.saTitle || '',",
+          "    text:             d.saText  || '',",
+          "    type:             d.saType  || 'info',",
+          "    html:             true,",
+          "    confirmButtonText: d.saBtn  || 'OK'",
+          "  });",
+          "});"
+        )),
 
-      # Left: demo outputs
+        # Delegated shinyhelper click handler — replaces the direct .on()
+        # binding in shinyhelper.js, which only captures icons present at
+        # bind time and misses icons injected by renderUI.
+        shiny::tags$script(htmltools::HTML(
+          "$(document).on('click', '.shinyhelper-icon', function () {",
+          "  var data = this.dataset;",
+          "  var nonce = Math.random();",
+          "  var modal_params = {",
+          "    size:      data.modalSize,",
+          "    type:      data.modalType,",
+          "    title:     data.modalTitle,",
+          "    content:   data.modalContent,",
+          "    label:     data.modalLabel,",
+          "    easyClose: data.modalEasyclose,",
+          "    fade:      data.modalFade,",
+          "    nonce:     nonce",
+          "  };",
+          "  Shiny.onInputChange('shinyhelper-modal_params', modal_params);",
+          "});"
+        ))
+      ),
+
+      # ── Sidebar (inputs + download) ──────────────────────────────────────
+      sidebar = mod_inputs_ui("inputs"),
+
+      # ── Main content — full width ────────────────────────────────────────
       mod_outputs_ui("outputs"),
 
-      # Right: about card + download card
-      shiny::tagList(
-        bslib::card(
-          bslib::card_header(
-            bsicons::bs_icon("info-circle"), " About"
-          ),
-          bslib::card_body(
-            shiny::tags$p(
-              "Explore six tooltip / hover-info approaches in R using real",
-              "financial data from ",
+      # ── Footer ──────────────────────────────────────────────────────────
+      shiny::tags$footer(
+        class = "mt-4 pt-3 pb-2 border-top text-muted small",
+        shiny::tags$div(
+          class = "d-flex flex-wrap gap-4 align-items-start",
+          shiny::tags$div(
+            shiny::tags$strong("Tooltip Explorer"),
+            shiny::tags$span(
+              " \u2014 explore six tooltip/hover-info approaches in R using real",
+              " financial data from ",
               shiny::tags$a(
                 href   = "https://www.tidy-finance.org/r/",
                 target = "_blank",
@@ -69,19 +99,21 @@ app_ui <- function() {
                 href   = "https://business-science.github.io/tidyquant/",
                 target = "_blank",
                 "tidyquant"
-              ), "."
-            ),
-            shiny::tags$ul(
-              shiny::tags$li(shiny::tags$b("plotly"), " – interactive hover"),
-              shiny::tags$li(shiny::tags$b("tippy"),  " – JS tooltip library"),
-              shiny::tags$li(shiny::tags$b("bslib"),  " – popover component"),
-              shiny::tags$li(shiny::tags$b("reactable"), " – cell title attr"),
-              shiny::tags$li(shiny::tags$b("gt"),     " – footnote tooltips"),
-              shiny::tags$li(shiny::tags$b("DT"),     " – Bootstrap tooltip")
+              ),
+              "."
+            )
+          ),
+          shiny::tags$div(
+            shiny::tags$strong("Packages: "),
+            shiny::tags$span(
+              shiny::tags$b("bslib"),        " (popover), ",
+              shiny::tags$b("shinyhelper"),  " (help modal), ",
+              shiny::tags$b("prompter"),     " (attribute tooltip), ",
+              shiny::tags$b("shinyalert"),   " (modal alert), ",
+              shiny::tags$b("reactable"),    " (cell title attr)"
             )
           )
-        ),
-        mod_download_ui("download")
+        )
       )
     )
   )

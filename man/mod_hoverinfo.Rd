@@ -5,76 +5,56 @@
 \title{Hover-info module}
 \usage{
 mod_hoverinfo(
-  type = c("plotly", "reactable", "gt"),
+  type = "reactable",
   contents = character(0),
+  display = NULL,
   size = NULL,
   style = NULL,
-  sep = "\\n",
   ...
 )
 }
 \arguments{
-\item{type}{Back-end to target.  One of \code{"plotly"} (default),
-\code{"reactable"}, or \code{"gt"}.}
+\item{type}{Back-end to target.  Currently only \code{"reactable"}.}
 
-\item{contents}{A named character vector or a single string.  For
-\code{"plotly"} and \code{"gt"} each \emph{element} becomes one line / footnote row.
-For \code{"reactable"} the vector is collapsed into a single \code{title}
-attribute value.  Names are used as labels when constructing multi-line
-content.}
+\item{contents}{A character string (or named character vector) used as the
+tooltip text in the \code{title} attribute.  Named vectors produce
+\code{"Name: value"} pairs joined by \code{" | "}.}
 
-\item{size}{Font-size for \code{"reactable"} span wrappers.  Accepts any
-valid CSS value (e.g. \code{"0.8rem"}).  Ignored by \code{"plotly"} and \code{"gt"}.}
+\item{display}{The value to render visibly inside the cell.  Passed as the
+child node of the \verb{<span>}.  Kept as an explicit parameter so it is
+never accidentally matched to \code{size} by positional argument order.}
 
-\item{style}{Inline CSS string for \code{"reactable"} span wrappers (e.g.
-\code{"cursor:help"}).  Ignored by \code{"plotly"} and \code{"gt"}.}
+\item{size}{CSS font-size for the span wrapper, e.g. \code{"0.8rem"}.
+\code{NULL} (default) leaves it unchanged.}
 
-\item{sep}{Separator used to join lines in \code{"plotly"} output.
-Defaults to \code{"\\\\n"}.}
+\item{style}{Inline CSS for the span wrapper, e.g. \code{"cursor:help"}.
+\code{NULL} (default) applies none.}
 
-\item{...}{Extra arguments forwarded to the underlying helper:
-\itemize{
-\item \code{"plotly"}    → unused (reserved for future glue/template support)
-\item \code{"reactable"} → passed as additional attributes to the \verb{<span>} tag
-constructed by \code{htmltools}
-\item \code{"gt"}        → passed to \code{\link[gt:tab_footnote]{gt::tab_footnote()}}
-}}
+\item{...}{Additional HTML attributes passed to the \verb{<span>} tag.}
 }
 \value{
-\itemize{
-\item \code{"plotly"}    — a single character string ready for the \code{text} aesthetic.
-\item \code{"reactable"} — an \code{htmltools} \verb{<span>} tag with a \code{title} attribute set.
-\item \code{"gt"}        — a named list with elements \code{footnote} (character) and
-\code{locations} (a \code{\link[gt:cells_column_labels]{gt::cells_column_labels()}} call), intended to be
-passed to \code{do.call(gt::tab_footnote, .)} inside a gt pipeline.
-}
+An \code{htmltools} \verb{<span>} tag with a \code{title} attribute set.
+Use inside a \code{reactable::colDef(cell = ..., html = TRUE)} renderer.
 }
 \description{
-A server-side helper that formats hover/tooltip content for table and chart
-back-ends that construct their tooltips programmatically (plotly, reactable,
-gt).  Returns either a character string or an \code{htmltools} tag, depending on
-the back-end.
+A server-side helper that formats hover/tooltip content for
+\code{reactable} table cells.  Wraps the display value in an \code{htmltools}
+\verb{<span>} with a \code{title} attribute, which browsers render as a native
+tooltip on hover.
 }
 \examples{
 \dontrun{
-# plotly text aesthetic
-mod_hoverinfo(
-  type     = "plotly",
-  contents = c(Ticker = "AAPL", Date = "2024-01-15", "Adj Close" = "$182.3")
-)
-# "Ticker: AAPL\nDate: 2024-01-15\nAdj Close: $182.3"
-
-# reactable span
-mod_hoverinfo(
-  type     = "reactable",
-  contents = c("Annualised return for AAPL: 12.4\%"),
-  style    = "color:#198754; cursor:help"
-)
-
-# gt footnote args list
-mod_hoverinfo(
-  type     = "gt",
-  contents = c(ann_return = "Annualised log return = mean daily log return x 252.")
+reactable::colDef(
+  name = "Ann. Return (\%)",
+  html = TRUE,
+  cell = function(value, index) {
+    mod_hoverinfo(
+      type     = "reactable",
+      contents = paste0("Annualised log return: ", value, "\%"),
+      display  = paste0(value, "\%"),
+      style    = "color:#198754; cursor:help"
+    )
+  }
 )
 }
 

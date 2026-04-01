@@ -1,98 +1,199 @@
 #' Tooltip module
 #'
-#' A lightweight UI helper that wraps several tooltip back-ends behind a
-#' single, consistent interface.  Drop it anywhere inside a UI or another
-#' module — no paired server function is required.
+#' A lightweight UI helper that wraps several tooltip/popover/modal back-ends
+#' behind a single, consistent interface.  Drop it anywhere inside a UI or
+#' another module — no paired server function is required.
 #'
-#' @param trigger  A `shiny.tag` (or plain text) that the tooltip attaches to.
-#'   Defaults to a small `bsicons::bs_icon("info-circle")`.
-#' @param type     Back-end to use.  One of `"tippy"` (default), `"bslib"`, or
-#'   `"bootstrap"`.
-#' @param contents Character string — the tooltip body.  HTML is allowed for
-#'   `"tippy"` and `"bslib"`.
-#' @param size     Font-size passed through to the rendered element.  Accepts
-#'   any valid CSS value, e.g. `"0.8rem"`, `"12px"`.  `NULL` (default) leaves
-#'   the font size unchanged.
-#' @param style    Additional inline CSS string applied to the trigger wrapper,
-#'   e.g. `"color:#2c7bb6; cursor:help"`.  `NULL` (default) applies none.
-#' @param ...      Extra arguments forwarded directly to the underlying
+#' @param trigger     A `shiny.tag` (or plain text) that the tooltip attaches
+#'   to.  Defaults to a small `bsicons::bs_icon("info-circle")`.
+#' @param type        Back-end to use.  One of `"bslib"` (default),
+#'   `"shinyhelper"`, `"prompter"`, or `"shinyalert"`.
+#' @param contents    Character string or vector — the tooltip/popover/modal
+#'   body.  HTML is accepted for `"bslib"`.  For `"shinyhelper"` a
+#'   plain-text character vector is preferred — elements are joined with
+#'   `<br>` by `helper(type = "inline")`, so embedding HTML tags causes
+#'   double-escaping.  Ignored as plain text by `"prompter"`.  For
+#'   `"shinyalert"` HTML is supported (rendered via `html: true`).
+#' @param size        CSS font-size for the trigger wrapper span, e.g.
+#'   `"0.85rem"`.  `NULL` (default) leaves the font size unchanged.  Note:
+#'   this is purely a CSS property on the wrapper — it is distinct from
+#'   `helper_size` (the shinyhelper modal size).
+#' @param style       Additional inline CSS for the trigger wrapper, e.g.
+#'   `"color:#6c757d"`.  `NULL` (default) applies none.
+#' @param helper_type Content type forwarded to `shinyhelper::helper()` as
+#'   its `type` argument.  One of `"inline"` (default) or `"markdown"`.
+#'   Ignored by all other back-ends.
+#' @param helper_size Modal size forwarded to `shinyhelper::helper()` as its
+#'   `size` argument.  One of `"s"`, `"m"` (default), or `"l"`.  Ignored by
+#'   all other back-ends.  Kept separate from `size` to avoid the two params
+#'   colliding.
+#' @param alert_type  Alert style forwarded to `shinyalert()` as its `type`
+#'   argument.  One of `"info"` (default), `"success"`, `"warning"`, or
+#'   `"error"`.  Ignored by all other back-ends.
+#' @param ...         Extra arguments forwarded directly to the underlying
 #'   back-end function:
-#'   * `"tippy"`     → [tippy::tippy()]
-#'   * `"bslib"`     → [bslib::popover()]
-#'   * `"bootstrap"` → ignored (all options live in HTML attributes)
+#'   * `"bslib"`       → [bslib::popover()]  (e.g. `title`, `placement`)
+#'   * `"shinyhelper"` → `shinyhelper::helper()`  (e.g. `title`, `colour`,
+#'     `icon`, `buttonLabel`, `easyClose`, `fade`)
+#'   * `"prompter"`    → `prompter::add_prompt()`  (e.g. `position`,
+#'     `rounded`, `bounce`, `arrow`, `animate`)
+#'   * `"shinyalert"`  → stored as `data-sa-*` attributes; recognised keys
+#'     are `title` and `confirmButtonText`
 #'
-#' @return A `shiny.tag` ready to embed in any UI.
+#' @return A `shiny.tag` (or `shiny.tagList`) ready to embed in any UI.
 #'
 #' @examples
 #' \dontrun{
-#' # tippy tooltip on a custom trigger
-#' mod_tooltip(shiny::tags$span("Hover me"), contents = "Hello tippy!")
+#' # bslib popover (click to open)
+#' mod_tooltip(
+#'   type     = "bslib",
+#'   contents = "A <b>bslib</b> popover with HTML.",
+#'   title    = "More info"
+#' )
 #'
-#' # bslib popover
-#' mod_tooltip(type = "bslib", contents = "A <b>bslib</b> popover")
+#' # shinyhelper inline help modal
+#' mod_tooltip(
+#'   trigger     = shiny::tags$span("Sharpe Ratio"),
+#'   type        = "shinyhelper",
+#'   contents    = c("Sharpe Ratio", "Assumes a zero risk-free rate."),
+#'   helper_type = "inline",
+#'   helper_size = "m",
+#'   title       = "Sharpe Ratio"
+#' )
 #'
-#' # plain Bootstrap tooltip
-#' mod_tooltip(type = "bootstrap", contents = "Bootstrap tooltip")
+#' # prompter attribute-driven tooltip
+#' mod_tooltip(
+#'   trigger  = bsicons::bs_icon("info-circle"),
+#'   type     = "prompter",
+#'   contents = "Number of trading days in the rolling window.",
+#'   position = "right"
+#' )
+#'
+#' # shinyalert modal on click (requires sa-handler to be present in UI)
+#' mod_tooltip(
+#'   trigger    = shiny::tags$span("What is ann. vol?"),
+#'   type       = "shinyalert",
+#'   contents   = "Annualised volatility = SD of daily log returns x sqrt(252).",
+#'   title      = "Annualised Volatility",
+#'   alert_type = "info"
+#' )
 #' }
 #'
 mod_tooltip <- function(
-    trigger  = bsicons::bs_icon("info-circle"),
-    type     = c("tippy", "bslib", "bootstrap"),
-    contents = "",
-    size     = NULL,
-    style    = NULL,
+    trigger     = bsicons::bs_icon("info-circle"),
+    type        = c("bslib", "shinyhelper", "prompter", "shinyalert"),
+    contents    = "",
+    size        = NULL,
+    style       = NULL,
+    helper_type = c("inline", "markdown"),
+    helper_size = c("m", "s", "l"),
+    alert_type  = c("info", "success", "warning", "error"),
     ...
 ) {
-  type <- match.arg(type)
+  type        <- match.arg(type)
+  helper_type <- match.arg(helper_type)
+  helper_size <- match.arg(helper_size)
+  alert_type  <- match.arg(alert_type)
 
-  # Build inline style string from size + style args
+  logger::log_debug(
+    "mod_tooltip() | type: {type} | contents length: {nchar(paste(contents, collapse = ''))}",
+    namespace = "tooltipexplorer/tooltip"
+  )
+
+  # Build inline CSS from the wrapper size + style args
   css_parts <- character(0)
   if (!is.null(size))  css_parts <- c(css_parts, paste0("font-size:", size))
   if (!is.null(style)) css_parts <- c(css_parts, style)
   inline_style <- if (length(css_parts)) paste(css_parts, collapse = "; ") else NULL
 
-  # Optionally wrap trigger in a styled span
   wrapped_trigger <- if (!is.null(inline_style)) {
     shiny::tags$span(style = inline_style, trigger)
   } else {
     trigger
   }
 
-  switch(
-    type,
+  tryCatch(
+    switch(
+      type,
 
-    tippy = {
-      tippy::tippy(
-        wrapped_trigger,
-        tooltip   = contents,
-        allowHTML = TRUE,
-        ...
-      )
-    },
+      # ── bslib ──────────────────────────────────────────────────────────────
+      bslib = {
+        logger::log_debug(
+          "mod_tooltip() dispatching to bslib::popover()",
+          namespace = "tooltipexplorer/tooltip"
+        )
+        bslib::popover(
+          wrapped_trigger,
+          shiny::HTML(contents),
+          ...
+        )
+      },
 
-    bslib = {
-      bslib::popover(
-        wrapped_trigger,
-        shiny::HTML(contents),
-        ...
-      )
-    },
+      # ── shinyhelper ────────────────────────────────────────────────────────
+      # helper_type and helper_size are dedicated params so they never clash
+      # with mod_tooltip()'s own `type` or CSS `size` params.
+      shinyhelper = {
+        logger::log_debug(
+          "mod_tooltip() dispatching to shinyhelper::helper() | helper_type: {helper_type} | helper_size: {helper_size}",
+          namespace = "tooltipexplorer/tooltip"
+        )
+        shinyhelper::helper(
+          wrapped_trigger,
+          type    = helper_type,
+          size    = helper_size,
+          content = contents,
+          ...
+        )
+      },
 
-    bootstrap = {
-      # Render trigger as a tag so we can add data-bs-* attributes
-      if (inherits(wrapped_trigger, "shiny.tag")) {
-        wrapped_trigger$attribs[["data-bs-toggle"]] <- "tooltip"
-        wrapped_trigger$attribs[["data-bs-title"]]  <- contents
-        wrapped_trigger$attribs[["title"]]          <- contents
-        wrapped_trigger
-      } else {
+      # ── prompter ───────────────────────────────────────────────────────────
+      prompter = {
+        logger::log_debug(
+          "mod_tooltip() dispatching to prompter::add_prompt()",
+          namespace = "tooltipexplorer/tooltip"
+        )
+        prompter::add_prompt(
+          wrapped_trigger,
+          message = contents,
+          ...
+        )
+      },
+
+      # ── shinyalert ─────────────────────────────────────────────────────────
+      # Content is stored in data-sa-* attributes rather than an onclick JS
+      # string.  htmltools HTML-escapes attribute values, but the browser's
+      # dataset API automatically decodes those entities before the delegated
+      # jQuery handler (injected once in app_ui()) reads them via $(el).data().
+      # This avoids the &quot; / &lt; escaping that breaks inline JS strings.
+      shinyalert = {
+        logger::log_debug(
+          "mod_tooltip() dispatching to shinyalert (data-* attrs) | alert_type: {alert_type}",
+          namespace = "tooltipexplorer/tooltip"
+        )
+        dots     <- list(...)
+        al_title <- dots[["title"]]             %||% ""
+        al_btn   <- dots[["confirmButtonText"]] %||% "OK"
+
         shiny::tags$span(
-          `data-bs-toggle` = "tooltip",
-          `data-bs-title`  = contents,
-          title            = contents,
-          wrapped_trigger
+          class            = "sa-trigger",
+          style            = paste(c("cursor:pointer", inline_style), collapse = "; "),
+          `data-sa-title`  = al_title,
+          `data-sa-text`   = contents,
+          `data-sa-type`   = alert_type,
+          `data-sa-btn`    = al_btn,
+          trigger
         )
       }
+    ),
+    error = function(e) {
+      logger::log_error(
+        "mod_tooltip() failed | type: {type} | error: {conditionMessage(e)}",
+        namespace = "tooltipexplorer/tooltip"
+      )
+      stop(e)
     }
   )
 }
+
+# Lightweight null-coalescing operator (avoid rlang dependency)
+`%||%` <- function(x, y) if (!is.null(x)) x else y

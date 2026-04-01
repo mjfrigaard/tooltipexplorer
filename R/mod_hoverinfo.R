@@ -1,97 +1,71 @@
 #' Hover-info module
 #'
-#' A server-side helper that formats hover/tooltip content for table and chart
-#' back-ends that construct their tooltips programmatically (plotly, reactable,
-#' gt).  Returns either a character string or an `htmltools` tag, depending on
-#' the back-end.
+#' A server-side helper that formats hover/tooltip content for
+#' `reactable` table cells.  Wraps the display value in an `htmltools`
+#' `<span>` with a `title` attribute, which browsers render as a native
+#' tooltip on hover.
 #'
-#' @param type     Back-end to target.  One of `"plotly"` (default),
-#'   `"reactable"`, or `"gt"`.
-#' @param contents A named character vector or a single string.  For
-#'   `"plotly"` and `"gt"` each *element* becomes one line / footnote row.
-#'   For `"reactable"` the vector is collapsed into a single `title`
-#'   attribute value.  Names are used as labels when constructing multi-line
-#'   content.
-#' @param size     Font-size for `"reactable"` span wrappers.  Accepts any
-#'   valid CSS value (e.g. `"0.8rem"`).  Ignored by `"plotly"` and `"gt"`.
-#' @param style    Inline CSS string for `"reactable"` span wrappers (e.g.
-#'   `"cursor:help"`).  Ignored by `"plotly"` and `"gt"`.
-#' @param sep      Separator used to join lines in `"plotly"` output.
-#'   Defaults to `"\\n"`.
-#' @param ...      Extra arguments forwarded to the underlying helper:
-#'   * `"plotly"`    → unused (reserved for future glue/template support)
-#'   * `"reactable"` → passed as additional attributes to the `<span>` tag
-#'     constructed by `htmltools`
-#'   * `"gt"`        → passed to [gt::tab_footnote()]
+#' @param type     Back-end to target.  Currently only `"reactable"`.
+#' @param contents A character string (or named character vector) used as the
+#'   tooltip text in the `title` attribute.  Named vectors produce
+#'   `"Name: value"` pairs joined by `" | "`.
+#' @param display  The value to render visibly inside the cell.  Passed as the
+#'   child node of the `<span>`.  Kept as an explicit parameter so it is
+#'   never accidentally matched to `size` by positional argument order.
+#' @param size     CSS font-size for the span wrapper, e.g. `"0.8rem"`.
+#'   `NULL` (default) leaves it unchanged.
+#' @param style    Inline CSS for the span wrapper, e.g. `"cursor:help"`.
+#'   `NULL` (default) applies none.
+#' @param ...      Additional HTML attributes passed to the `<span>` tag.
 #'
-#' @return
-#' * `"plotly"`    — a single character string ready for the `text` aesthetic.
-#' * `"reactable"` — an `htmltools` `<span>` tag with a `title` attribute set.
-#' * `"gt"`        — a named list with elements `footnote` (character) and
-#'   `locations` (a [gt::cells_column_labels()] call), intended to be
-#'   passed to `do.call(gt::tab_footnote, .)` inside a gt pipeline.
+#' @return An `htmltools` `<span>` tag with a `title` attribute set.
+#'   Use inside a `reactable::colDef(cell = ..., html = TRUE)` renderer.
 #'
 #' @examples
 #' \dontrun{
-#' # plotly text aesthetic
-#' mod_hoverinfo(
-#'   type     = "plotly",
-#'   contents = c(Ticker = "AAPL", Date = "2024-01-15", "Adj Close" = "$182.3")
-#' )
-#' # "Ticker: AAPL\nDate: 2024-01-15\nAdj Close: $182.3"
-#'
-#' # reactable span
-#' mod_hoverinfo(
-#'   type     = "reactable",
-#'   contents = c("Annualised return for AAPL: 12.4%"),
-#'   style    = "color:#198754; cursor:help"
-#' )
-#'
-#' # gt footnote args list
-#' mod_hoverinfo(
-#'   type     = "gt",
-#'   contents = c(ann_return = "Annualised log return = mean daily log return x 252.")
+#' reactable::colDef(
+#'   name = "Ann. Return (%)",
+#'   html = TRUE,
+#'   cell = function(value, index) {
+#'     mod_hoverinfo(
+#'       type     = "reactable",
+#'       contents = paste0("Annualised log return: ", value, "%"),
+#'       display  = paste0(value, "%"),
+#'       style    = "color:#198754; cursor:help"
+#'     )
+#'   }
 #' )
 #' }
 #'
 mod_hoverinfo <- function(
-    type     = c("plotly", "reactable", "gt"),
+    type     = "reactable",
     contents = character(0),
+    display  = NULL,
     size     = NULL,
     style    = NULL,
-    sep      = "\n",
     ...
 ) {
-  type <- match.arg(type)
+  type <- match.arg(type, choices = "reactable")
 
-  switch(
-    type,
+  logger::log_debug(
+    "mod_hoverinfo() | type: {type} | contents length: {length(contents)}",
+    namespace = "tooltipexplorer/hoverinfo"
+  )
 
-    # ── plotly ──────────────────────────────────────────────────────────────
-    # Returns a single newline-separated string.  Named vectors produce
-    # "Name: value" lines; unnamed vectors are used as-is.
-    plotly = {
-      if (!is.null(names(contents)) && any(nzchar(names(contents)))) {
-        lines <- ifelse(
-          nzchar(names(contents)),
-          paste0(names(contents), ": ", contents),
-          contents
-        )
-      } else {
-        lines <- contents
-      }
-      paste(lines, collapse = sep)
-    },
+  tryCatch(
+    {
+      logger::log_debug(
+        "mod_hoverinfo() building reactable span | named: {!is.null(names(contents))}",
+        namespace = "tooltipexplorer/hoverinfo"
+      )
 
-    # ── reactable ───────────────────────────────────────────────────────────
-    # Returns an htmltools span with a title= attribute.  Named vectors are
-    # joined as "Name: value" lines separated by " | ".
-    reactable = {
       if (!is.null(names(contents)) && any(nzchar(names(contents)))) {
         tip_text <- paste(
-          ifelse(nzchar(names(contents)),
-                 paste0(names(contents), ": ", contents),
-                 contents),
+          ifelse(
+            nzchar(names(contents)),
+            paste0(names(contents), ": ", contents),
+            contents
+          ),
           collapse = " | "
         )
       } else {
@@ -105,39 +79,16 @@ mod_hoverinfo <- function(
 
       span_args <- list(title = tip_text, ...)
       if (!is.null(inline_style)) span_args[["style"]] <- inline_style
+      if (!is.null(display))      span_args            <- c(span_args, list(display))
 
       do.call(htmltools::tags$span, span_args)
     },
-
-    # ── gt ──────────────────────────────────────────────────────────────────
-    # Returns a list of argument lists, one per footnote, ready to be
-    # iterated with purrr::reduce / Reduce and do.call(gt::tab_footnote, .).
-    # `contents` should be a *named* character vector where each name is a
-    # column name (string) and each value is the footnote text.
-    gt = {
-      if (is.null(names(contents)) || !any(nzchar(names(contents)))) {
-        stop(
-          "`contents` must be a named character vector for type = 'gt'. ",
-          "Names should be column names (as strings).",
-          call. = FALSE
-        )
-      }
-
-      mapply(
-        function(col, footnote_text) {
-          c(
-            list(
-              footnote  = footnote_text,
-              locations = gt::cells_column_labels(columns = col)
-            ),
-            list(...)
-          )
-        },
-        col           = names(contents),
-        footnote_text = unname(contents),
-        SIMPLIFY      = FALSE,
-        USE.NAMES     = FALSE
+    error = function(e) {
+      logger::log_error(
+        "mod_hoverinfo() failed | type: {type} | error: {conditionMessage(e)}",
+        namespace = "tooltipexplorer/hoverinfo"
       )
+      stop(e)
     }
   )
 }

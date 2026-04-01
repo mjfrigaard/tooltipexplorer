@@ -9,9 +9,9 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse  = TRUE,
-  comment   = "#>",
-  eval      = FALSE
+  collapse = TRUE,
+  comment  = "#>",
+  eval     = FALSE
 )
 ```
 
@@ -23,14 +23,13 @@ tooltip and hover-info content to UI elements and outputs.
   placed anywhere in a UI tree or inside another module's UI function — no
   server-side counterpart is needed.
 - **`mod_hoverinfo()`** is a *server/logic helper*. It formats hover content
-  for back-ends that build their tooltips programmatically (plotly, reactable,
-  gt) rather than through HTML attributes.
+  for back-ends that build their tooltips programmatically (reactable, gt) rather than through HTML attributes.
 
 The two functions cover complementary ground:
 
 | Question | Function |
 |---|---|
-| "I want a hover tooltip on a *label* or *icon* in the UI" | `mod_tooltip()` |
+| "I want a hover/click tooltip on a *label* or *icon* in the UI" | `mod_tooltip()` |
 | "I want hover content inside a *chart or table cell*" | `mod_hoverinfo()` |
 
 ---
@@ -42,7 +41,7 @@ The two functions cover complementary ground:
 ```{r}
 mod_tooltip(
   trigger  = bsicons::bs_icon("info-circle"),
-  type     = c("tippy", "bslib", "bootstrap"),
+  type     = c("bslib", "shinyhelper", "prompter", "shinyalert"),
   contents = "",
   size     = NULL,
   style    = NULL,
@@ -55,40 +54,45 @@ mod_tooltip(
 | Parameter | Type | Description |
 |---|---|---|
 | `trigger` | `shiny.tag` or text | The element the tooltip attaches to. Defaults to a small info-circle icon. |
-| `type` | character | Back-end: `"tippy"` (default), `"bslib"`, or `"bootstrap"`. |
-| `contents` | character | Tooltip body text. HTML is accepted for `"tippy"` and `"bslib"`. |
+| `type` | character | Back-end: `"bslib"` (default), `"shinyhelper"`, `"prompter"`, or `"shinyalert"`. |
+| `contents` | character | Tooltip/popover/modal body text. HTML is accepted for all back-ends. |
 | `size` | character | CSS font-size for the trigger wrapper, e.g. `"0.85rem"`. `NULL` leaves it unchanged. |
 | `style` | character | Additional inline CSS for the trigger wrapper, e.g. `"color:#6c757d"`. `NULL` applies none. |
-| `...` | — | Extra arguments forwarded to the underlying back-end (`tippy::tippy()`, `bslib::popover()`). |
+| `...` | — | Extra arguments forwarded to the underlying back-end function. See per-back-end notes below. |
 
 ### How it works
 
 `size` and `style` are combined into a single inline CSS string and applied to
 a `<span>` that wraps `trigger`. The wrapped trigger is then passed to the
-chosen back-end:
+chosen back-end via `switch()`.
 
-- **`"tippy"`** — calls `tippy::tippy()` with `allowHTML = TRUE`. Any `...`
-  args (e.g. `placement`, `theme`, `animation`) go straight to
-  `tippy::tippy()`.
-- **`"bslib"`** — calls `bslib::popover()`, wrapping `contents` in
-  `shiny::HTML()` so HTML markup renders. Any `...` args (e.g. `title`,
-  `placement`) go to `bslib::popover()`.
-- **`"bootstrap"`** — attaches `data-bs-toggle="tooltip"`,
-  `data-bs-title`, and `title` attributes directly to the trigger tag. No
-  external JS is injected; Bootstrap's tooltip JavaScript (already loaded by
-  bslib) picks these up automatically.
+```
+mod_tooltip(trigger, type, contents, size, style, ...)
+       │
+       ├─ build inline CSS from size + style
+       ├─ wrap trigger in <span style="..."> if CSS is non-NULL
+       │
+       └─ switch(type)
+            ├─ "bslib"       → bslib::popover(trigger, HTML(contents), ...)
+            ├─ "shinyhelper" → shinyhelper::helper(trigger, content = contents, ...)
+            ├─ "prompter"    → prompter::add_prompt(trigger, message = contents, ...)
+            └─ "shinyalert"  → tagList(useShinyalert(), <span onclick="shinyalert(...)">)
+```
 
 ### Usage in a module UI
 
+The most common use is attaching a small info icon to an input label so the
+label carries its own contextual help without any server code:
+
 ```{r}
-# Inside mod_inputs_ui() — tooltip on a slider label
+# Inside mod_inputs_ui() — bslib popover on a slider label
 shiny::sliderInput(
   inputId = ns("vol_window"),
   label   = shiny::tags$span(
     "Rolling vol window (days)",
     mod_tooltip(
       trigger  = bsicons::bs_icon("info-circle"),
-      type     = "tippy",
+      type     = "bslib",
       contents = "Number of trading days used for the rolling volatility calculation.",
       size     = "0.85rem",
       style    = "color:#6c757d"
@@ -98,37 +102,25 @@ shiny::sliderInput(
 )
 ```
 
-The tooltip icon sits *inside* the label tag, so it travels with the label
-wherever the input is rendered — no additional server logic required.
+The tooltip icon sits *inside* the label tag — it travels with the label
+wherever the input is rendered with no additional server logic.
 
-### Back-end examples
+---
 
-#### tippy
+### Back-end: `"bslib"`
 
-```{r}
-# Plain text
-mod_tooltip(
-  trigger  = shiny::tags$span("Hover me"),
-  type     = "tippy",
-  contents = "Hello from tippy!"
-)
-
-# HTML contents + extra tippy options
-mod_tooltip(
-  trigger   = bsicons::bs_icon("question-circle"),
-  type      = "tippy",
-  contents  = "<b>Sharpe ratio</b><br>Assumes a zero risk-free rate.",
-  size      = "0.8rem",
-  style     = "color:#0d6efd; cursor:help",
-  placement = "right",
-  theme     = "light-border"
-)
-```
-
-#### bslib
+`bslib::popover()` opens on click and renders `contents` as HTML inside a
+Bootstrap 5 popover. Pass `title` to show a popover header; pass `placement`
+(`"top"`, `"right"`, `"bottom"`, `"left"`) to control direction.
 
 ```{r}
-# Popover with an HTML list body and a title
+# Minimal popover — just a body
+mod_tooltip(
+  type     = "bslib",
+  contents = "Annualised log return = mean daily log return \u00d7 252."
+)
+
+# Popover with a title and HTML list body, attached to a value-box title
 mod_tooltip(
   trigger  = bsicons::bs_icon("info-circle-fill", class = "ms-1 text-info"),
   type     = "bslib",
@@ -137,20 +129,124 @@ mod_tooltip(
     <li>Ann. Vol: 22.1%</li>
     <li>Sharpe: 0.64</li>
   </ul>",
-  title    = "AAPL — Performance Summary"
+  title    = "AAPL \u2013 Performance Summary",
+  placement = "left"
 )
 ```
 
-#### bootstrap
+**Where it appears in the app:** the *bslib* demo tab — each value box has a
+clickable info icon in its title.
+
+---
+
+### Back-end: `"shinyhelper"`
+
+`shinyhelper::helper()` wraps any tag and appends a circled-? icon. Clicking
+the icon opens a modal dialog. Set `type = "inline"` (the default used here)
+to render `contents` as an HTML string directly inside the modal body. Other
+`type` values include `"markdown"` (reads a `.md` file) and `"text"` (plain
+text).
+
+`shinyhelper::observe_helpers()` must appear **once** in the UI (it is placed
+in the nav panel header in `mod_outputs_ui()`).
 
 ```{r}
-# Adds data-bs-toggle="tooltip" attributes; Bootstrap JS activates on hover
+# Basic inline modal — content is an HTML string
 mod_tooltip(
-  trigger  = shiny::tags$span("ⓘ", class = "text-muted"),
-  type     = "bootstrap",
-  contents = "Annualised log return × 252 trading days."
+  trigger  = shiny::tags$span(class = "fs-4 fw-bold", "AAPL"),
+  type     = "shinyhelper",
+  contents = "<b>AAPL</b><br>Ann. Return: 14.2%<br>Sharpe: 0.64",
+  type     = "inline",     # forwarded to shinyhelper::helper()
+  title    = "AAPL \u2013 Performance Summary",
+  size     = "m"           # modal size: "s", "m", "l"
 )
 ```
+
+**Where it appears in the app:** the *shinyhelper* demo tab — each metric card
+shows a circled-? that opens a performance summary modal.
+
+---
+
+### Back-end: `"prompter"`
+
+`prompter::add_prompt()` attaches a CSS-only tooltip via `data-*` HTML
+attributes. No JavaScript initialisation is required beyond calling
+`prompter::use_prompt()` **once** in the UI (placed in the nav panel header in
+`mod_outputs_ui()`). Because the tooltip is CSS-driven, it works even in static
+HTML contexts.
+
+Key extra args (forwarded via `...`):
+
+| Arg | Values | Effect |
+|---|---|---|
+| `position` | `"top"`, `"right"`, `"bottom"`, `"left"` | Tooltip placement |
+| `rounded` | `TRUE` / `FALSE` | Rounded tooltip corners |
+| `bounce` | `TRUE` / `FALSE` | Bounce animation on hover |
+| `arrow` | `TRUE` / `FALSE` | Show/hide the tip arrow |
+
+```{r}
+# Tooltip on a metric label — appears to the right on hover
+mod_tooltip(
+  trigger  = shiny::tags$span("Ann. Return"),
+  type     = "prompter",
+  contents = "Annualised log return for AAPL: 14.2%",
+  position = "right"
+)
+
+# Rounded, no arrow, bounces on hover
+mod_tooltip(
+  trigger  = shiny::tags$span("Sharpe"),
+  type     = "prompter",
+  contents = "Sharpe ratio (zero risk-free rate): 0.64",
+  position = "top",
+  rounded  = TRUE,
+  bounce   = TRUE,
+  arrow    = FALSE
+)
+```
+
+**Where it appears in the app:** the *prompter* demo tab — each metric row
+(`Ann. Return`, `Ann. Vol`, `Sharpe`) has a prompter tooltip on its label.
+
+---
+
+### Back-end: `"shinyalert"`
+
+`shinyalert` is a modal-alert library. Unlike the other back-ends, it does not
+use a hover event — it fires when the user *clicks* the trigger. `mod_tooltip()`
+handles this by:
+
+1. Calling `shinyalert::useShinyalert()` to inject the required JS dependency.
+2. Attaching an `onclick` attribute to the trigger that calls the `shinyalert()`
+   JavaScript function directly — no `shiny::observeEvent()` or server-side
+   handler is needed.
+
+The result is a `shiny::tagList()` of the dependency tag and the wired trigger.
+
+Key extra args (forwarded and extracted via `...`):
+
+| Arg | Description |
+|---|---|
+| `title` | Modal title bar text |
+| `type` | Alert style: `"info"`, `"success"`, `"warning"`, `"error"`, `""` |
+| `confirmButtonText` | Label for the confirm/close button |
+| `closeOnClickOutside` | `TRUE` to dismiss by clicking outside the modal |
+
+```{r}
+# Clickable span that opens an info modal
+mod_tooltip(
+  trigger           = shiny::tags$span(class = "fs-4 fw-bold", "AAPL"),
+  type              = "shinyalert",
+  contents          = "Ann. Return: 14.2%\nAnn. Vol: 22.1%\nSharpe: 0.64",
+  title             = "AAPL \u2013 Performance Summary",
+  type              = "info",
+  confirmButtonText = "Close",
+  closeOnClickOutside = TRUE
+)
+```
+
+**Where it appears in the app:** the *shinyalert* demo tab — clicking any
+ticker card opens a formatted modal with full performance metrics.
 
 ---
 
@@ -160,11 +256,10 @@ mod_tooltip(
 
 ```{r}
 mod_hoverinfo(
-  type     = c("plotly", "reactable", "gt"),
+  type     = c("reactable", "gt"),
   contents = character(0),
   size     = NULL,
   style    = NULL,
-  sep      = "\n",
   ...
 )
 ```
@@ -173,23 +268,24 @@ mod_hoverinfo(
 
 | Parameter | Type | Description |
 |---|---|---|
-| `type` | character | Back-end: `"plotly"` (default), `"reactable"`, or `"gt"`. |
+| `type` | character | Back-end: `"reactable"` (default) or `"gt"`. |
 | `contents` | character vector | Hover content. Named vectors produce `"Name: value"` lines. See per-back-end notes below. |
-| `size` | character | CSS font-size for the `"reactable"` span wrapper. Ignored by `"plotly"` and `"gt"`. |
-| `style` | character | Inline CSS for the `"reactable"` span wrapper. Ignored by `"plotly"` and `"gt"`. |
-| `sep` | character | Line separator for `"plotly"` output. Defaults to `"\n"`. |
-| `...` | — | Forwarded to the underlying helper. For `"reactable"`, passed as extra HTML attributes on the `<span>`; for `"gt"`, passed to `gt::tab_footnote()`. |
+| `size` | character | CSS font-size for the `"reactable"` span wrapper. Ignored by `"gt"`. |
+| `style` | character | Inline CSS for the `"reactable"` span wrapper. Ignored by `"gt"`. |
+| `...` | — | For `"reactable"`: extra HTML attributes on the `<span>`; for `"gt"`: passed to `gt::tab_footnote()`. |
 
 ### How it works — by back-end
 
-#### `"plotly"`
+#### `"reactable"`
 
 Returns a single character string. Named vectors produce `"Name: value"` lines
-joined by `sep` (`"\n"` by default). This string is assigned to the `text`
-aesthetic in `ggplot2` and then read by `plotly::ggplotly(tooltip = "text")`.
+joined by `sep` (`"\n"` by default). The string is assigned to the `text`
+aesthetic in `ggplot2` and read by `plotly::ggplotly(tooltip = "text")`.
+
+`mapply()` with `SIMPLIFY = TRUE` vectorises the call row-by-row across the
+entire data frame, producing one string per data point:
 
 ```{r}
-# Inside mod_outputs_server() — building the plotly text aesthetic
 ggplot2::aes(
   text = mapply(
     function(sym, dt, adj) {
@@ -206,21 +302,15 @@ ggplot2::aes(
     SIMPLIFY = TRUE
   )
 )
-# Each point's hover text: "Ticker: AAPL\nDate: 2024-01-15\nAdj Close: $182.30"
+# Produces per-point strings like: "Ticker: AAPL\nDate: 2024-01-15\nAdj Close: $182.30"
 ```
-
-`mapply()` with `SIMPLIFY = TRUE` vectorises the call across all rows of the
-data frame, producing one string per observation.
 
 #### `"reactable"`
 
-Returns an `htmltools` `<span>` tag. The `contents` vector is collapsed into a
-`title` attribute (using `" | "` as a separator for multi-element vectors),
-which browsers display as a native tooltip on hover. `size` and `style` are
-applied as inline CSS on the span.
-
-Pass the return value directly as the `cell` renderer in
-`reactable::colDef()`:
+Returns an `htmltools` `<span>` tag. `contents` is collapsed into a `title`
+attribute (browser-native tooltip on hover), with named elements joined as
+`"Name: value"` pairs separated by `" | "`. `size` and `style` become inline
+CSS on the span. Additional child nodes (display text) pass through `...`:
 
 ```{r}
 reactable::colDef(
@@ -235,79 +325,88 @@ reactable::colDef(
         "color:", if (value >= 0) "#198754" else "#dc3545",
         "; cursor:help"
       ),
-      glue::glue("{value}%")   # <-- display text passed via ...
+      glue::glue("{value}%")  # display text passed via ...
     )
   }
 )
 ```
 
-The display text (`"{value}%"`) is passed through `...` as an additional child
-node of the `<span>`, so the cell renders the formatted value while the full
-hover string lives in `title`.
+The display text (`"{value}%"`) is an extra child node of the `<span>`, so the
+cell renders the formatted value while the full hover description lives in
+`title`.
 
 #### `"gt"`
 
 Returns a **list of argument lists** — one per named element of `contents`.
-Each list has two elements:
-
-- `footnote` — the footnote text string
-- `locations` — a `gt::cells_column_labels()` call targeting that column
-
-These are applied to a gt table by iterating with `do.call(gt::tab_footnote, .)`:
+Each list contains `footnote` (text) and `locations` (a
+`gt::cells_column_labels()` call). Apply them with `do.call()` in a loop:
 
 ```{r}
-# Build footnote args for three columns at once
 footnotes <- mod_hoverinfo(
   type     = "gt",
   contents = c(
-    ann_return = "Annualised log return = mean daily log return × 252.",
-    ann_vol    = "Annualised volatility = SD of daily log returns × √252.",
+    ann_return = "Annualised log return = mean daily log return \u00d7 252.",
+    ann_vol    = "Annualised volatility = SD of daily log returns \u00d7 \u221a252.",
     sharpe     = "Sharpe ratio assumes a zero risk-free rate."
   )
 )
 
-# Apply each footnote in a loop
 tbl <- gt::gt(df)
 for (fn_args in footnotes) {
   tbl <- do.call(gt::tab_footnote, c(list(tbl), fn_args))
 }
 ```
 
-`contents` **must** be a named character vector for `"gt"`. The names are
-column identifiers passed to `gt::cells_column_labels(columns = col)` and must
-match actual column names in the gt table.
+`contents` **must** be a named character vector. Names are column identifiers
+passed to `gt::cells_column_labels()` and must match actual column names in the
+gt table.
 
 ---
 
 ## Decision guide
 
-Use this table to pick the right function and `type` for any given situation:
-
 | Where does the tooltip appear? | Package / context | Function | `type` |
 |---|---|---|---|
-| Input label, heading, icon in sidebar or UI | Any | `mod_tooltip()` | `"tippy"` |
-| Value box title or showcase icon | bslib | `mod_tooltip()` | `"bslib"` |
-| Static span or button in UI | Bootstrap | `mod_tooltip()` | `"bootstrap"` |
-| Hover text on a ggplot → plotly chart | plotly | `mod_hoverinfo()` | `"plotly"` |
+| Input label, heading, or icon in sidebar/UI | bslib | `mod_tooltip()` | `"bslib"` |
+| Metric card with inline help modal | shinyhelper | `mod_tooltip()` | `"shinyhelper"` |
+| Metric label with CSS-driven attribute tooltip | prompter | `mod_tooltip()` | `"prompter"` |
+| Clickable element that opens a modal alert | shinyalert | `mod_tooltip()` | `"shinyalert"` |
 | Cell tooltip in a reactable table | reactable | `mod_hoverinfo()` | `"reactable"` |
 | Column-header footnote in a gt table | gt | `mod_hoverinfo()` | `"gt"` |
+
+---
 
 ## Placement in the module stack
 
 ```
 app_ui()
-  └─ mod_inputs_ui()          ← mod_tooltip() used in labels
-  └─ mod_outputs_ui()         ← output placeholders only
+  └─ mod_inputs_ui()
+       └─ mod_tooltip(type = "bslib")        <- label popovers in sidebar
+
+  └─ mod_outputs_ui()
+       └─ use_prompt()                        <- prompter CSS dependency (once)
 
 app_server()
-  └─ mod_inputs_server()      ← returns reactive inputs list
-  └─ mod_outputs_server()     ← mod_hoverinfo() used in render* functions
-       └─ renderPlotly         mod_hoverinfo(type = "plotly",  ...)
-       └─ renderReactable      mod_hoverinfo(type = "reactable", ...)
-       └─ render_gt            mod_hoverinfo(type = "gt", ...)
-  └─ mod_download_server()    ← consumes perf_r from mod_outputs_server()
+  └─ mod_inputs_server()                      <- returns reactive inputs list
+
+  └─ mod_outputs_server()
+       ├─ observe_helpers()                   <- shinyhelper server observer (once)
+       ├─ renderUI  (bslib tab)
+       │    └─ mod_tooltip(type = "bslib")
+       ├─ renderUI  (shinyhelper tab)
+       │    └─ mod_tooltip(type = "shinyhelper")
+       ├─ renderUI  (prompter tab)
+       │    └─ mod_tooltip(type = "prompter")
+       ├─ renderUI  (shinyalert tab)
+       │    └─ mod_tooltip(type = "shinyalert")
+       ├─ renderReactable
+       │    └─ mod_hoverinfo(type = "reactable")
+       └─ render_gt
+            └─ mod_hoverinfo(type = "gt")
+
+  └─ mod_download_server()                    <- consumes perf_r
 ```
 
 Neither helper requires its own `moduleServer()` call or namespace — they are
-plain functions that fit into the existing module hierarchy at exactly the
+plain functions that slot into the existing module hierarchy at exactly the
 point where tooltip content is needed.

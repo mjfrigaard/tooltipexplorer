@@ -11,7 +11,7 @@ mod_inputs_server(id)
 }
 \description{
 Sidebar controls for ticker selection, date range, rolling-vol window,
-and tooltip-type picker.
+and report download.
 }
 \section{UI}{
 
@@ -22,7 +22,6 @@ and tooltip-type picker.
 \section{Server}{
 
 \code{mod_inputs_server()} returns a reactive list with elements: \code{tickers},
-\code{from}, \code{to}, \code{vol_window}, \code{tooltip_type}, and \code{fetch} (the
-action-button integer).
+\code{from}, \code{to}, \code{vol_window}, and \code{fetch} (the action-button integer).
 }
 

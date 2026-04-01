@@ -1,7 +1,7 @@
 #' Inputs module (UI)
 #'
 #' Sidebar controls for ticker selection, date range, rolling-vol window,
-#' and tooltip-type picker.
+#' and report download.
 #'
 #' @section UI:
 #' `mod_inputs_ui()` returns a `bslib::sidebar()` ready to embed in a
@@ -9,8 +9,7 @@
 #'
 #' @section Server:
 #' `mod_inputs_server()` returns a reactive list with elements: `tickers`,
-#' `from`, `to`, `vol_window`, `tooltip_type`, and `fetch` (the
-#' action-button integer).
+#' `from`, `to`, `vol_window`, and `fetch` (the action-button integer).
 #'
 #' @param id Module namespace id.
 #'
@@ -28,7 +27,7 @@ mod_inputs_ui <- function(id) {
         "Tickers",
         mod_tooltip(
           trigger  = bsicons::bs_icon("info-circle"),
-          type     = "tippy",
+          type     = "bslib",
           contents = "Enter one or more stock ticker symbols (e.g. AAPL, MSFT).",
           size     = "0.85rem",
           style    = "color:#6c757d"
@@ -61,7 +60,7 @@ mod_inputs_ui <- function(id) {
         "Rolling vol window (days)",
         mod_tooltip(
           trigger  = bsicons::bs_icon("info-circle"),
-          type     = "tippy",
+          type     = "bslib",
           contents = "Number of trading days used for the rolling volatility calculation.",
           size     = "0.85rem",
           style    = "color:#6c757d"
@@ -75,41 +74,17 @@ mod_inputs_ui <- function(id) {
 
     shiny::hr(),
 
-    # ── Tooltip-demo selector ─────────────────────────────────────────────
-    shiny::radioButtons(
-      inputId  = ns("tooltip_type"),
-      label    = shiny::tags$span(
-        "Tooltip / hover method",
-        mod_tooltip(
-          trigger  = bsicons::bs_icon("info-circle"),
-          type     = "tippy",
-          contents = paste(
-            "Choose which tooltip technology to demo in the Output tab.",
-            "Each option highlights a different R package or approach."
-          ),
-          size     = "0.85rem",
-          style    = "color:#6c757d"
-        )
-      ),
-      choices  = c(
-        "plotly (interactive)"     = "plotly",
-        "tippy (HTML tooltip)"     = "tippy",
-        "bslib value boxes"        = "bslib",
-        "reactable (cell tooltip)" = "reactable",
-        "gt (column tooltip)"      = "gt",
-        "DT (Bootstrap tooltip)"   = "dt"
-      ),
-      selected = "plotly"
-    ),
-
-    shiny::hr(),
-
     shiny::actionButton(
       inputId = ns("fetch"),
       label   = "Fetch data",
       icon    = shiny::icon("download"),
       class   = "btn-primary w-100"
-    )
+    ),
+
+    shiny::hr(),
+
+    # ── Report download ───────────────────────────────────────────────────
+    mod_download_ui("download")
   )
 }
 
@@ -118,7 +93,7 @@ mod_inputs_ui <- function(id) {
 #' Inputs module (server)
 #'
 #' Sidebar controls for ticker selection, date range, rolling-vol window,
-#' and tooltip-type picker.
+#' and report download.
 #'
 #' @section UI:
 #' `mod_inputs_ui()` returns a `bslib::sidebar()` ready to embed in a
@@ -126,18 +101,32 @@ mod_inputs_ui <- function(id) {
 #'
 #' @section Server:
 #' `mod_inputs_server()` returns a reactive list with elements: `tickers`,
-#' `from`, `to`, `vol_window`, `tooltip_type`, and `fetch` (the
-#' action-button integer).
+#' `from`, `to`, `vol_window`, and `fetch` (the action-button integer).
 #'
 #' @param id Module namespace id.
 #'
 mod_inputs_server <- function(id) {
   shiny::moduleServer(id, function(input, output, session) {
 
-    # Warn if no tickers selected when Fetch is pressed
+    logger::log_debug(
+      "mod_inputs_server() initialised | id: {id}",
+      namespace = "tooltipexplorer/inputs"
+    )
+
+    # ── Fetch button observer ───────────────────────────────────────────────
     shiny::observe({
       shiny::req(input$fetch)
+
+      logger::log_info(
+        "Fetch button pressed | tickers: [{paste(input$tickers, collapse = ', ')}] | from: {input$dates[1]} | to: {input$dates[2]} | vol_window: {input$vol_window}",
+        namespace = "tooltipexplorer/inputs"
+      )
+
       if (length(input$tickers) == 0) {
+        logger::log_warn(
+          "Fetch pressed with no tickers selected",
+          namespace = "tooltipexplorer/inputs"
+        )
         shiny::showNotification(
           "Please select at least one ticker.",
           type = "warning"
@@ -145,14 +134,27 @@ mod_inputs_server <- function(id) {
       }
     })
 
+    # ── Reactive inputs list ────────────────────────────────────────────────
     shiny::reactive({
-      list(
-        tickers      = input$tickers,
-        from         = input$dates[1],
-        to           = input$dates[2],
-        vol_window   = input$vol_window,
-        tooltip_type = input$tooltip_type,
-        fetch        = input$fetch
+      with_logging(
+        context = "mod_inputs_server / reactive list",
+        ns      = "tooltipexplorer/inputs",
+        {
+          inp <- list(
+            tickers    = input$tickers,
+            from       = input$dates[1],
+            to         = input$dates[2],
+            vol_window = input$vol_window,
+            fetch      = input$fetch
+          )
+
+          logger::log_debug(
+            "Inputs reactive evaluated | tickers: [{paste(inp$tickers, collapse = ', ')}]",
+            namespace = "tooltipexplorer/inputs"
+          )
+
+          inp
+        }
       )
     })
   })
