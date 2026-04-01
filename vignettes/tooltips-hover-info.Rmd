@@ -1,0 +1,313 @@
+---
+title: "Tooltip and Hover-Info Modules"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tooltip and Hover-Info Modules}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  eval      = FALSE
+)
+```
+
+Two helper functions — `mod_tooltip()` and `mod_hoverinfo()` — give every
+module in **tooltipexplorer** a consistent, package-agnostic way to attach
+tooltip and hover-info content to UI elements and outputs.
+
+- **`mod_tooltip()`** is a *UI helper*. It returns a `shiny.tag` and can be
+  placed anywhere in a UI tree or inside another module's UI function — no
+  server-side counterpart is needed.
+- **`mod_hoverinfo()`** is a *server/logic helper*. It formats hover content
+  for back-ends that build their tooltips programmatically (plotly, reactable,
+  gt) rather than through HTML attributes.
+
+The two functions cover complementary ground:
+
+| Question | Function |
+|---|---|
+| "I want a hover tooltip on a *label* or *icon* in the UI" | `mod_tooltip()` |
+| "I want hover content inside a *chart or table cell*" | `mod_hoverinfo()` |
+
+---
+
+## `mod_tooltip()`
+
+### Signature
+
+```{r}
+mod_tooltip(
+  trigger  = bsicons::bs_icon("info-circle"),
+  type     = c("tippy", "bslib", "bootstrap"),
+  contents = "",
+  size     = NULL,
+  style    = NULL,
+  ...
+)
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `trigger` | `shiny.tag` or text | The element the tooltip attaches to. Defaults to a small info-circle icon. |
+| `type` | character | Back-end: `"tippy"` (default), `"bslib"`, or `"bootstrap"`. |
+| `contents` | character | Tooltip body text. HTML is accepted for `"tippy"` and `"bslib"`. |
+| `size` | character | CSS font-size for the trigger wrapper, e.g. `"0.85rem"`. `NULL` leaves it unchanged. |
+| `style` | character | Additional inline CSS for the trigger wrapper, e.g. `"color:#6c757d"`. `NULL` applies none. |
+| `...` | — | Extra arguments forwarded to the underlying back-end (`tippy::tippy()`, `bslib::popover()`). |
+
+### How it works
+
+`size` and `style` are combined into a single inline CSS string and applied to
+a `<span>` that wraps `trigger`. The wrapped trigger is then passed to the
+chosen back-end:
+
+- **`"tippy"`** — calls `tippy::tippy()` with `allowHTML = TRUE`. Any `...`
+  args (e.g. `placement`, `theme`, `animation`) go straight to
+  `tippy::tippy()`.
+- **`"bslib"`** — calls `bslib::popover()`, wrapping `contents` in
+  `shiny::HTML()` so HTML markup renders. Any `...` args (e.g. `title`,
+  `placement`) go to `bslib::popover()`.
+- **`"bootstrap"`** — attaches `data-bs-toggle="tooltip"`,
+  `data-bs-title`, and `title` attributes directly to the trigger tag. No
+  external JS is injected; Bootstrap's tooltip JavaScript (already loaded by
+  bslib) picks these up automatically.
+
+### Usage in a module UI
+
+```{r}
+# Inside mod_inputs_ui() — tooltip on a slider label
+shiny::sliderInput(
+  inputId = ns("vol_window"),
+  label   = shiny::tags$span(
+    "Rolling vol window (days)",
+    mod_tooltip(
+      trigger  = bsicons::bs_icon("info-circle"),
+      type     = "tippy",
+      contents = "Number of trading days used for the rolling volatility calculation.",
+      size     = "0.85rem",
+      style    = "color:#6c757d"
+    )
+  ),
+  min = 5L, max = 120L, value = 30L, step = 5L
+)
+```
+
+The tooltip icon sits *inside* the label tag, so it travels with the label
+wherever the input is rendered — no additional server logic required.
+
+### Back-end examples
+
+#### tippy
+
+```{r}
+# Plain text
+mod_tooltip(
+  trigger  = shiny::tags$span("Hover me"),
+  type     = "tippy",
+  contents = "Hello from tippy!"
+)
+
+# HTML contents + extra tippy options
+mod_tooltip(
+  trigger   = bsicons::bs_icon("question-circle"),
+  type      = "tippy",
+  contents  = "<b>Sharpe ratio</b><br>Assumes a zero risk-free rate.",
+  size      = "0.8rem",
+  style     = "color:#0d6efd; cursor:help",
+  placement = "right",
+  theme     = "light-border"
+)
+```
+
+#### bslib
+
+```{r}
+# Popover with an HTML list body and a title
+mod_tooltip(
+  trigger  = bsicons::bs_icon("info-circle-fill", class = "ms-1 text-info"),
+  type     = "bslib",
+  contents = "<ul>
+    <li>Ann. Return: 14.2%</li>
+    <li>Ann. Vol: 22.1%</li>
+    <li>Sharpe: 0.64</li>
+  </ul>",
+  title    = "AAPL — Performance Summary"
+)
+```
+
+#### bootstrap
+
+```{r}
+# Adds data-bs-toggle="tooltip" attributes; Bootstrap JS activates on hover
+mod_tooltip(
+  trigger  = shiny::tags$span("ⓘ", class = "text-muted"),
+  type     = "bootstrap",
+  contents = "Annualised log return × 252 trading days."
+)
+```
+
+---
+
+## `mod_hoverinfo()`
+
+### Signature
+
+```{r}
+mod_hoverinfo(
+  type     = c("plotly", "reactable", "gt"),
+  contents = character(0),
+  size     = NULL,
+  style    = NULL,
+  sep      = "\n",
+  ...
+)
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `type` | character | Back-end: `"plotly"` (default), `"reactable"`, or `"gt"`. |
+| `contents` | character vector | Hover content. Named vectors produce `"Name: value"` lines. See per-back-end notes below. |
+| `size` | character | CSS font-size for the `"reactable"` span wrapper. Ignored by `"plotly"` and `"gt"`. |
+| `style` | character | Inline CSS for the `"reactable"` span wrapper. Ignored by `"plotly"` and `"gt"`. |
+| `sep` | character | Line separator for `"plotly"` output. Defaults to `"\n"`. |
+| `...` | — | Forwarded to the underlying helper. For `"reactable"`, passed as extra HTML attributes on the `<span>`; for `"gt"`, passed to `gt::tab_footnote()`. |
+
+### How it works — by back-end
+
+#### `"plotly"`
+
+Returns a single character string. Named vectors produce `"Name: value"` lines
+joined by `sep` (`"\n"` by default). This string is assigned to the `text`
+aesthetic in `ggplot2` and then read by `plotly::ggplotly(tooltip = "text")`.
+
+```{r}
+# Inside mod_outputs_server() — building the plotly text aesthetic
+ggplot2::aes(
+  text = mapply(
+    function(sym, dt, adj) {
+      mod_hoverinfo(
+        type     = "plotly",
+        contents = c(
+          Ticker      = sym,
+          Date        = as.character(dt),
+          "Adj Close" = paste0("$", round(adj, 2))
+        )
+      )
+    },
+    sym = symbol, dt = date, adj = adjusted,
+    SIMPLIFY = TRUE
+  )
+)
+# Each point's hover text: "Ticker: AAPL\nDate: 2024-01-15\nAdj Close: $182.30"
+```
+
+`mapply()` with `SIMPLIFY = TRUE` vectorises the call across all rows of the
+data frame, producing one string per observation.
+
+#### `"reactable"`
+
+Returns an `htmltools` `<span>` tag. The `contents` vector is collapsed into a
+`title` attribute (using `" | "` as a separator for multi-element vectors),
+which browsers display as a native tooltip on hover. `size` and `style` are
+applied as inline CSS on the span.
+
+Pass the return value directly as the `cell` renderer in
+`reactable::colDef()`:
+
+```{r}
+reactable::colDef(
+  name = "Ann. Return (%)",
+  cell = function(value, index) {
+    mod_hoverinfo(
+      type     = "reactable",
+      contents = glue::glue(
+        "Annualised log return for {df$symbol[index]}: {value}%"
+      ),
+      style    = paste0(
+        "color:", if (value >= 0) "#198754" else "#dc3545",
+        "; cursor:help"
+      ),
+      glue::glue("{value}%")   # <-- display text passed via ...
+    )
+  }
+)
+```
+
+The display text (`"{value}%"`) is passed through `...` as an additional child
+node of the `<span>`, so the cell renders the formatted value while the full
+hover string lives in `title`.
+
+#### `"gt"`
+
+Returns a **list of argument lists** — one per named element of `contents`.
+Each list has two elements:
+
+- `footnote` — the footnote text string
+- `locations` — a `gt::cells_column_labels()` call targeting that column
+
+These are applied to a gt table by iterating with `do.call(gt::tab_footnote, .)`:
+
+```{r}
+# Build footnote args for three columns at once
+footnotes <- mod_hoverinfo(
+  type     = "gt",
+  contents = c(
+    ann_return = "Annualised log return = mean daily log return × 252.",
+    ann_vol    = "Annualised volatility = SD of daily log returns × √252.",
+    sharpe     = "Sharpe ratio assumes a zero risk-free rate."
+  )
+)
+
+# Apply each footnote in a loop
+tbl <- gt::gt(df)
+for (fn_args in footnotes) {
+  tbl <- do.call(gt::tab_footnote, c(list(tbl), fn_args))
+}
+```
+
+`contents` **must** be a named character vector for `"gt"`. The names are
+column identifiers passed to `gt::cells_column_labels(columns = col)` and must
+match actual column names in the gt table.
+
+---
+
+## Decision guide
+
+Use this table to pick the right function and `type` for any given situation:
+
+| Where does the tooltip appear? | Package / context | Function | `type` |
+|---|---|---|---|
+| Input label, heading, icon in sidebar or UI | Any | `mod_tooltip()` | `"tippy"` |
+| Value box title or showcase icon | bslib | `mod_tooltip()` | `"bslib"` |
+| Static span or button in UI | Bootstrap | `mod_tooltip()` | `"bootstrap"` |
+| Hover text on a ggplot → plotly chart | plotly | `mod_hoverinfo()` | `"plotly"` |
+| Cell tooltip in a reactable table | reactable | `mod_hoverinfo()` | `"reactable"` |
+| Column-header footnote in a gt table | gt | `mod_hoverinfo()` | `"gt"` |
+
+## Placement in the module stack
+
+```
+app_ui()
+  └─ mod_inputs_ui()          ← mod_tooltip() used in labels
+  └─ mod_outputs_ui()         ← output placeholders only
+
+app_server()
+  └─ mod_inputs_server()      ← returns reactive inputs list
+  └─ mod_outputs_server()     ← mod_hoverinfo() used in render* functions
+       └─ renderPlotly         mod_hoverinfo(type = "plotly",  ...)
+       └─ renderReactable      mod_hoverinfo(type = "reactable", ...)
+       └─ render_gt            mod_hoverinfo(type = "gt", ...)
+  └─ mod_download_server()    ← consumes perf_r from mod_outputs_server()
+```
+
+Neither helper requires its own `moduleServer()` call or namespace — they are
+plain functions that fit into the existing module hierarchy at exactly the
+point where tooltip content is needed.
