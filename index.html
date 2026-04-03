@@ -67,9 +67,9 @@
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/tooltipexplorer/">tooltipexplorer</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Launch the Shiny app</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/tooltipexplorer/">tooltipexplorer</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Launch the Shiny app</span></span>
 <span><span class="fu"><a href="reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Use the sidebar to select tickers and a date range, then click <strong>Fetch data</strong>. Each of the five tabs demonstrates a different tooltip or hover-info approach.</p>
 </div>
@@ -128,7 +128,7 @@
 <h2 id="data-utilities">Data utilities<a class="anchor" aria-label="anchor" href="#data-utilities"></a>
 </h2>
 <p>The package exports a small set of financial data helpers you can use outside Shiny:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prices</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_stock_prices.html">get_stock_prices</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AAPL"</span>, <span class="st">"MSFT"</span><span class="op">)</span>, from <span class="op">=</span> <span class="st">"2024-01-01"</span><span class="op">)</span></span>
 <span><span class="va">returns</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_stock_returns.html">get_stock_returns</a></span><span class="op">(</span><span class="va">prices</span><span class="op">)</span></span>
 <span><span class="va">perf</span>    <span class="op">&lt;-</span> <span class="fu"><a href="reference/summarise_performance.html">summarise_performance</a></span><span class="op">(</span><span class="va">returns</span><span class="op">)</span></span>
@@ -141,7 +141,7 @@
 <h2 id="tooltip-helpers">Tooltip helpers<a class="anchor" aria-label="anchor" href="#tooltip-helpers"></a>
 </h2>
 <p><code><a href="reference/mod_tooltip.html">mod_tooltip()</a></code> provides a single interface across all click/hover back-ends:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># bslib popover (click)</span></span>
 <span><span class="fu"><a href="reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  type     <span class="op">=</span> <span class="st">"bslib"</span>,</span>
@@ -157,7 +157,7 @@
 <span>  position <span class="op">=</span> <span class="st">"right"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="reference/mod_hoverinfo.html">mod_hoverinfo()</a></code> formats hover content for <code>reactable</code> table cells:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reactable</span><span class="fu">::</span><span class="fu"><a href="https://glin.github.io/reactable/reference/colDef.html" class="external-link">colDef</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Ann. Return (%)"</span>,</span>
 <span>  html <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -175,7 +175,7 @@
 <h2 id="logging">Logging<a class="anchor" aria-label="anchor" href="#logging"></a>
 </h2>
 <p>All modules use the <code>logger</code> package. Set the threshold once at session start:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span><span class="op">)</span>  <span class="co"># verbose (development)</span></span>
 <span><span class="fu"><a href="reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">WARN</a></span><span class="op">)</span>   <span class="co"># quiet   (production)</span></span></code></pre></div>
 </div>
