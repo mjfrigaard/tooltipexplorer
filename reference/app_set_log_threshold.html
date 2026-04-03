@@ -68,6 +68,9 @@ level to every logger namespace used by <strong>tooltipexplorer</strong>.</p>
 <code>TRACE</code>, <code>DEBUG</code>, <code>INFO</code>, <code>SUCCESS</code>, <code>WARN</code>, <code>ERROR</code>, <code>FATAL</code>.
 The default threshold is <code>INFO</code> — <code>TRACE</code> and <code>DEBUG</code> lines are silent
 in production.</p>
+<p>Internally, <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> iterates over the namespace vector and calls
+<code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code> for each entry.  The return value of <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code>
+is discarded; only <code>level</code> is returned (invisibly).</p>
     </div>
 
     <div class="section level2">

@@ -201,6 +201,10 @@ the examples below.</p>
 <p>This is the single entry point for changing thresholds. It is called
 once per session in <code><a href="../reference/app_server.html">app_server()</a></code> and applies the same level
 to every namespace in the table above.</p>
+<p><code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> iterates over the namespace vector, calling
+<code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code> for each entry. Its return value (a
+list of <code>NULL</code>s) is discarded — only <code>level</code> is
+returned invisibly.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_set_log_threshold</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">level</span> <span class="op">=</span> <span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">namespaces</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -212,9 +216,7 @@ to every namespace in the table above.</p>
 <span>    <span class="st">"tooltipexplorer/tooltip"</span>,</span>
 <span>    <span class="st">"tooltipexplorer/hoverinfo"</span></span>
 <span>  <span class="op">)</span></span>
-<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">ns</span> <span class="kw">in</span> <span class="va">namespaces</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span><span class="va">level</span>, namespace <span class="op">=</span> <span class="va">ns</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">namespaces</span>, \<span class="op">(</span><span class="va">ns</span><span class="op">)</span> <span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span><span class="va">level</span>, namespace <span class="op">=</span> <span class="va">ns</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">level</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="section level3">

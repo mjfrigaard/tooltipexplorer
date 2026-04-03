@@ -57,6 +57,12 @@ once per session in
 [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
 and applies the same level to every namespace in the table above.
 
+[`lapply()`](https://rdrr.io/r/base/lapply.html) iterates over the
+namespace vector, calling
+[`logger::log_threshold()`](https://daroczig.github.io/logger/reference/log_threshold.html)
+for each entry. Its return value (a list of `NULL`s) is discarded — only
+`level` is returned invisibly.
+
 ``` r
 app_set_log_threshold <- function(level = logger::INFO) {
   namespaces <- c(
@@ -68,9 +74,7 @@ app_set_log_threshold <- function(level = logger::INFO) {
     "tooltipexplorer/tooltip",
     "tooltipexplorer/hoverinfo"
   )
-  for (ns in namespaces) {
-    logger::log_threshold(level, namespace = ns)
-  }
+  lapply(namespaces, \(ns) logger::log_threshold(level, namespace = ns))
   invisible(level)
 }
 ```

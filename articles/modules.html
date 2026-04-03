@@ -65,10 +65,10 @@
 
     
     
-<p>tooltipexplorer is organised as a collection of Shiny modules wired
-together by a thin <code><a href="../reference/app_server.html">app_server()</a></code>. This vignette explains the
-naming convention, the UI/server split, how data flows between modules,
-and the role each module plays.</p>
+<p><code>tooltipexplorer</code> is organized as a collection of Shiny
+modules, wired together in the <code><a href="../reference/app_server.html">app_server()</a></code>. This vignette
+explains the naming convention, the UI/server split, how data flows
+between modules, and the role each module plays.</p>
 <hr>
 <div class="section level2">
 <h2 id="naming-convention">Naming convention<a class="anchor" aria-label="anchor" href="#naming-convention"></a>
@@ -106,12 +106,13 @@ and the role each module plays.</p>
 <p>The two tooltip helpers (<code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code> and
 <code><a href="../reference/mod_hoverinfo.html">mod_hoverinfo()</a></code>) are <em>not</em> modules in the Shiny
 sense — they have no server counterpart and no
-<code>moduleServer()</code> call. They are UI / rendering helpers that
-happen to share the <code>mod_</code> prefix for discoverability.</p>
+<code>moduleServer()</code> call.</p>
+<p>They are UI / rendering helpers that happen to share the
+<code>mod_</code> prefix for discoverability.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="how-modules-are-wired">How modules are wired<a class="anchor" aria-label="anchor" href="#how-modules-are-wired"></a>
+<h2 id="module-wiring">Module wiring<a class="anchor" aria-label="anchor" href="#module-wiring"></a>
 </h2>
 <p><code><a href="../reference/app_ui.html">app_ui()</a></code> composes the three UI functions into a
 <code><a href="https://rstudio.github.io/bslib/reference/page_sidebar.html" class="external-link">bslib::page_sidebar()</a></code> layout. The download module UI is
@@ -137,16 +138,17 @@ download server consumes — this is the only inter-module dependency.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The reactive data flow is strictly top-down:</p>
 <pre><code>mod_inputs_server()  ──► inputs_r  ──► mod_outputs_server()  ──► perf_r  ──► mod_download_server()</code></pre>
-<p>No module reaches up into its parent or sideways into a sibling.</p>
+<p><strong>No module reaches up into its parent or sideways into a
+sibling.</strong></p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="mod_inputs">mod_inputs<a class="anchor" aria-label="anchor" href="#mod_inputs"></a>
+<h2 id="inputs-mod_inputs">Inputs: <code>mod_inputs</code><a class="anchor" aria-label="anchor" href="#inputs-mod_inputs"></a>
 </h2>
 <p><strong>Files:</strong> <code>R/mod_inputs.R</code><br><strong>Exports:</strong> <code><a href="../reference/mod_inputs_ui.html">mod_inputs_ui()</a></code>,
 <code><a href="../reference/mod_inputs_server.html">mod_inputs_server()</a></code></p>
 <div class="section level3">
-<h3 id="ui">UI<a class="anchor" aria-label="anchor" href="#ui"></a>
+<h3 id="ui-function">UI function<a class="anchor" aria-label="anchor" href="#ui-function"></a>
 </h3>
 <p><code>mod_inputs_ui(id)</code> returns a
 <code><a href="https://rstudio.github.io/bslib/reference/sidebar.html" class="external-link">bslib::sidebar()</a></code> containing:</p>
@@ -167,8 +169,8 @@ days</li>
 bottom</li>
 </ul>
 <p><code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code> with <code>type = "bslib"</code> is used
-on the ticker and vol-window labels to attach bslib popovers without any
-server-side code:</p>
+on the ticker and vol-window labels to attach <code>bslib</code>
+popovers without any server-side code:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/selectInput.html" class="external-link">selectizeInput</a></span><span class="op">(</span></span>
 <span>  inputId <span class="op">=</span> <span class="fu">ns</span><span class="op">(</span><span class="st">"tickers"</span><span class="op">)</span>,</span>
@@ -186,7 +188,7 @@ server-side code:</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="server">Server<a class="anchor" aria-label="anchor" href="#server"></a>
+<h3 id="server-function">Server function<a class="anchor" aria-label="anchor" href="#server-function"></a>
 </h3>
 <p><code>mod_inputs_server(id)</code> logs the fetch event and validates
 that at least one ticker is selected, then returns a <strong>reactive
@@ -207,12 +209,12 @@ the user explicitly requests new data.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="mod_outputs">mod_outputs<a class="anchor" aria-label="anchor" href="#mod_outputs"></a>
+<h2 id="outputs-mod_outputs">Outputs: <code>mod_outputs</code><a class="anchor" aria-label="anchor" href="#outputs-mod_outputs"></a>
 </h2>
 <p><strong>Files:</strong> <code>R/mod_outputs.R</code><br><strong>Exports:</strong> <code><a href="../reference/mod_outputs_ui.html">mod_outputs_ui()</a></code>,
 <code><a href="../reference/mod_outputs_server.html">mod_outputs_server()</a></code></p>
 <div class="section level3">
-<h3 id="ui-1">UI<a class="anchor" aria-label="anchor" href="#ui-1"></a>
+<h3 id="ui-function-1">UI function<a class="anchor" aria-label="anchor" href="#ui-function-1"></a>
 </h3>
 <p><code>mod_outputs_ui(id)</code> returns a
 <code><a href="https://rstudio.github.io/htmltools/reference/tagList.html" class="external-link">shiny::tagList()</a></code> with two pieces:</p>
@@ -238,14 +240,14 @@ tooltip back-end.</li>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>bslib</td>
+<td><code>bslib</code></td>
 <td>
 <code><a href="https://rstudio.github.io/bslib/reference/popover.html" class="external-link">bslib::popover()</a></code> via <code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code>
 </td>
 <td>Click info icon</td>
 </tr>
 <tr class="even">
-<td>shinyhelper</td>
+<td><code>shinyhelper</code></td>
 <td>
 <code><a href="https://rdrr.io/pkg/shinyhelper/man/helper.html" class="external-link">shinyhelper::helper()</a></code> via
 <code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code>
@@ -253,7 +255,7 @@ tooltip back-end.</li>
 <td>Click circled-?</td>
 </tr>
 <tr class="odd">
-<td>prompter</td>
+<td><code>prompter</code></td>
 <td>
 <code><a href="https://rdrr.io/pkg/prompter/man/add_prompt.html" class="external-link">prompter::add_prompt()</a></code> via
 <code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code>
@@ -261,7 +263,7 @@ tooltip back-end.</li>
 <td>Hover over label</td>
 </tr>
 <tr class="even">
-<td>shinyalert</td>
+<td><code>shinyalert</code></td>
 <td>
 <code>data-sa-*</code> attrs + delegated JS via
 <code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code>
@@ -280,13 +282,13 @@ tooltip back-end.</li>
 </table>
 </div>
 <div class="section level3">
-<h3 id="server-1">Server<a class="anchor" aria-label="anchor" href="#server-1"></a>
+<h3 id="server-function-1">Server function<a class="anchor" aria-label="anchor" href="#server-function-1"></a>
 </h3>
-<p><code>mod_outputs_server(id, inputs_r)</code> is the computational
-core of the app. It registers
+<p><strong><code>mod_outputs_server(id, inputs_r)</code> is the
+computational core of the app</strong>. It registers
 <code><a href="https://rdrr.io/pkg/shinyhelper/man/observe_helpers.html" class="external-link">shinyhelper::observe_helpers()</a></code> once per session (required
-by shinyhelper; do not call it separately in <code><a href="../reference/app_server.html">app_server()</a></code>),
-then chains four reactives triggered by
+by <code>shinyhelper</code>; do not call it separately in
+<code><a href="../reference/app_server.html">app_server()</a></code>), then chains four reactives triggered by
 <code>inputs_r()$fetch</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1 — fetch adjusted prices</span></span>
@@ -316,14 +318,14 @@ without re-computing it.</p>
 <div class="section level3">
 <h3 id="kpi-value-boxes">KPI value boxes<a class="anchor" aria-label="anchor" href="#kpi-value-boxes"></a>
 </h3>
-<p>The value boxes are coloured by Sharpe ratio threshold:</p>
+<p>The value boxes are colored by Sharpe ratio threshold:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">theme</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="st">"success"</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="st">"warning"</span> <span class="kw">else</span> <span class="st">"danger"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="reactable-tab-and-mod_hoverinfo">reactable tab and <code>mod_hoverinfo()</code><a class="anchor" aria-label="anchor" href="#reactable-tab-and-mod_hoverinfo"></a>
 </h3>
-<p>The reactable tab is the only output that uses
+<p>The <code>reactable</code> tab is the only output that uses
 <code><a href="../reference/mod_hoverinfo.html">mod_hoverinfo()</a></code>. Each numeric column in the performance
 table gets a <code>colDef</code> cell renderer that wraps the formatted
 value in an <code>htmltools</code>
@@ -350,12 +352,12 @@ value in an <code>htmltools</code>
 </div>
 </div>
 <div class="section level2">
-<h2 id="mod_download">mod_download<a class="anchor" aria-label="anchor" href="#mod_download"></a>
+<h2 id="downloads-mod_download">Downloads: mod_download<a class="anchor" aria-label="anchor" href="#downloads-mod_download"></a>
 </h2>
 <p><strong>Files:</strong> <code>R/mod_download.R</code><br><strong>Exports:</strong> <code><a href="../reference/mod_download_ui.html">mod_download_ui()</a></code>,
 <code><a href="../reference/mod_download_server.html">mod_download_server()</a></code></p>
 <div class="section level3">
-<h3 id="ui-2">UI<a class="anchor" aria-label="anchor" href="#ui-2"></a>
+<h3 id="ui-function-2">UI function<a class="anchor" aria-label="anchor" href="#ui-function-2"></a>
 </h3>
 <p><code>mod_download_ui(id)</code> returns a <code><a href="https://rstudio.github.io/bslib/reference/card.html" class="external-link">bslib::card()</a></code>
 with:</p>
@@ -366,8 +368,8 @@ with:</p>
 <li>
 <code>downloadButton</code> — triggers the handler</li>
 </ul>
-<p>The card is embedded at the bottom of the inputs sidebar by
-<code><a href="../reference/mod_inputs_ui.html">mod_inputs_ui()</a></code>:</p>
+<p>The <code>card</code> is embedded at the bottom of the inputs sidebar
+by <code><a href="../reference/mod_inputs_ui.html">mod_inputs_ui()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># inside mod_inputs_ui()</span></span>
 <span><span class="fu">bslib</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/bslib/reference/sidebar.html" class="external-link">sidebar</a></span><span class="op">(</span></span>
@@ -378,13 +380,13 @@ with:</p>
 is wired at the top level in <code><a href="../reference/app_server.html">app_server()</a></code>.</p>
 </div>
 <div class="section level3">
-<h3 id="server-2">Server<a class="anchor" aria-label="anchor" href="#server-2"></a>
+<h3 id="server">Server<a class="anchor" aria-label="anchor" href="#server"></a>
 </h3>
 <p><code>mod_download_server(id, inputs_r, perf_r)</code> renders
 <code>inst/report_template.Rmd</code> into a temporary directory via
 <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render()</a></code> and serves the output through
-<code><a href="https://rdrr.io/pkg/shiny/man/downloadHandler.html" class="external-link">shiny::downloadHandler()</a></code>. Parameters passed to the
-template:</p>
+<code><a href="https://rdrr.io/pkg/shiny/man/downloadHandler.html" class="external-link">shiny::downloadHandler()</a></code>.</p>
+<p>Below are the parameters passed to the template:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  tickers    <span class="op">=</span> <span class="va">inp</span><span class="op">$</span><span class="va">tickers</span>,</span>
