@@ -22,6 +22,10 @@ Log levels from lowest to highest verbosity:
 \code{TRACE}, \code{DEBUG}, \code{INFO}, \code{SUCCESS}, \code{WARN}, \code{ERROR}, \code{FATAL}.
 The default threshold is \code{INFO} — \code{TRACE} and \code{DEBUG} lines are silent
 in production.
+
+Internally, \code{lapply()} iterates over the namespace vector and calls
+\code{\link[logger:log_threshold]{logger::log_threshold()}} for each entry.  The return value of \code{lapply()}
+is discarded; only \code{level} is returned (invisibly).
 }
 \examples{
 \dontrun{

@@ -64,6 +64,10 @@ This is the single entry point for changing thresholds.  It is called once per
 session in `app_server()` and applies the same level to every namespace in the
 table above.
 
+`lapply()` iterates over the namespace vector, calling
+`logger::log_threshold()` for each entry.  Its return value (a list of `NULL`s)
+is discarded — only `level` is returned invisibly.
+
 ```{r app_set_log_threshold-source}
 app_set_log_threshold <- function(level = logger::INFO) {
   namespaces <- c(
@@ -75,9 +79,7 @@ app_set_log_threshold <- function(level = logger::INFO) {
     "tooltipexplorer/tooltip",
     "tooltipexplorer/hoverinfo"
   )
-  for (ns in namespaces) {
-    logger::log_threshold(level, namespace = ns)
-  }
+  lapply(namespaces, \(ns) logger::log_threshold(level, namespace = ns))
   invisible(level)
 }
 ```

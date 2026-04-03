@@ -11,34 +11,29 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
 ```
 
-tooltipexplorer is organised as a collection of Shiny modules wired together
-by a thin `app_server()`.  This vignette explains the naming convention, the
-UI/server split, how data flows between modules, and the role each module plays.
+`tooltipexplorer` is organized as a collection of Shiny modules, wired together in the `app_server()`. This vignette explains the naming convention, the UI/server split, how data flows between modules, and the role each module plays.
 
----
+------------------------------------------------------------------------
 
 ## Naming convention
 
 Every module follows the same file-and-function layout:
 
 | File | UI function | Server function |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `R/mod_inputs.R` | `mod_inputs_ui(id)` | `mod_inputs_server(id)` |
 | `R/mod_outputs.R` | `mod_outputs_ui(id)` | `mod_outputs_server(id, inputs_r)` |
 | `R/mod_download.R` | `mod_download_ui(id)` | `mod_download_server(id, inputs_r, perf_r)` |
 
-The two tooltip helpers (`mod_tooltip()` and `mod_hoverinfo()`) are *not*
-modules in the Shiny sense — they have no server counterpart and no
-`moduleServer()` call.  They are UI / rendering helpers that happen to share
-the `mod_` prefix for discoverability.
+The two tooltip helpers (`mod_tooltip()` and `mod_hoverinfo()`) are *not* modules in the Shiny sense — they have no server counterpart and no `moduleServer()` call.
 
----
+They are UI / rendering helpers that happen to share the `mod_` prefix for discoverability.
 
-## How modules are wired
+------------------------------------------------------------------------
 
-`app_ui()` composes the three UI functions into a `bslib::page_sidebar()`
-layout.  The download module UI is embedded *inside* the inputs sidebar rather
-than at the top level, so the sidebar contains all user controls in one place.
+## Module wiring
+
+`app_ui()` composes the three UI functions into a `bslib::page_sidebar()` layout. The download module UI is embedded *inside* the inputs sidebar rather than at the top level, so the sidebar contains all user controls in one place.
 
 ```{r}
 app_ui <- function() {
@@ -49,9 +44,7 @@ app_ui <- function() {
 }
 ```
 
-`app_server()` wires the three server functions together.  The outputs server
-returns a reactive (`perf_r`) that the download server consumes — this is the
-only inter-module dependency.
+`app_server()` wires the three server functions together. The outputs server returns a reactive (`perf_r`) that the download server consumes — this is the only inter-module dependency.
 
 ```{r}
 app_server <- function(input, output, session) {
@@ -65,20 +58,20 @@ app_server <- function(input, output, session) {
 
 The reactive data flow is strictly top-down:
 
-```
+```         
 mod_inputs_server()  ──► inputs_r  ──► mod_outputs_server()  ──► perf_r  ──► mod_download_server()
 ```
 
-No module reaches up into its parent or sideways into a sibling.
+**No module reaches up into its parent or sideways into a sibling.**
 
----
+------------------------------------------------------------------------
 
-## mod_inputs
+## Inputs: `mod_inputs`
 
-**Files:** `R/mod_inputs.R`  
+**Files:** `R/mod_inputs.R`\
 **Exports:** `mod_inputs_ui()`, `mod_inputs_server()`
 
-### UI
+### UI function
 
 `mod_inputs_ui(id)` returns a `bslib::sidebar()` containing:
 
@@ -88,8 +81,7 @@ No module reaches up into its parent or sideways into a sibling.
 - `actionButton` — "Fetch data" trigger
 - `mod_download_ui("download")` — embedded at the bottom
 
-`mod_tooltip()` with `type = "bslib"` is used on the ticker and vol-window
-labels to attach bslib popovers without any server-side code:
+`mod_tooltip()` with `type = "bslib"` is used on the ticker and vol-window labels to attach `bslib` popovers without any server-side code:
 
 ```{r}
 shiny::selectizeInput(
@@ -108,10 +100,9 @@ shiny::selectizeInput(
 )
 ```
 
-### Server
+### Server function
 
-`mod_inputs_server(id)` logs the fetch event and validates that at least one
-ticker is selected, then returns a **reactive list**:
+`mod_inputs_server(id)` logs the fetch event and validates that at least one ticker is selected, then returns a **reactive list**:
 
 ```{r}
 list(
@@ -123,39 +114,33 @@ list(
 )
 ```
 
-The `fetch` element is an integer counter incremented each time the button is
-pressed.  Downstream modules use `eventReactive(inputs_r()$fetch, ...)` to
-re-run only when the user explicitly requests new data.
+The `fetch` element is an integer counter incremented each time the button is pressed. Downstream modules use `eventReactive(inputs_r()$fetch, ...)` to re-run only when the user explicitly requests new data.
 
----
+------------------------------------------------------------------------
 
-## mod_outputs
+## Outputs: `mod_outputs`
 
-**Files:** `R/mod_outputs.R`  
+**Files:** `R/mod_outputs.R`\
 **Exports:** `mod_outputs_ui()`, `mod_outputs_server()`
 
-### UI
+### UI function
 
 `mod_outputs_ui(id)` returns a `shiny::tagList()` with two pieces:
 
-1. `shiny::uiOutput(ns("value_boxes"))` — KPI value boxes rendered
-   server-side so the number of boxes matches the number of selected tickers.
-2. `bslib::navset_card_tab()` — five demo tabs, one per tooltip back-end.
+1.  `shiny::uiOutput(ns("value_boxes"))` — KPI value boxes rendered server-side so the number of boxes matches the number of selected tickers.
+2.  `bslib::navset_card_tab()` — five demo tabs, one per tooltip back-end.
 
 | Tab | Back-end | Interaction |
-|---|---|---|
-| bslib | `bslib::popover()` via `mod_tooltip()` | Click info icon |
-| shinyhelper | `shinyhelper::helper()` via `mod_tooltip()` | Click circled-? |
-| prompter | `prompter::add_prompt()` via `mod_tooltip()` | Hover over label |
-| shinyalert | `data-sa-*` attrs + delegated JS via `mod_tooltip()` | Click ticker card |
+|------------------------|------------------------|------------------------|
+| `bslib` | `bslib::popover()` via `mod_tooltip()` | Click info icon |
+| `shinyhelper` | `shinyhelper::helper()` via `mod_tooltip()` | Click circled-? |
+| `prompter` | `prompter::add_prompt()` via `mod_tooltip()` | Hover over label |
+| `shinyalert` | `data-sa-*` attrs + delegated JS via `mod_tooltip()` | Click ticker card |
 | reactable | `htmltools` `<span title>` via `mod_hoverinfo()` | Hover over cell |
 
-### Server
+### Server function
 
-`mod_outputs_server(id, inputs_r)` is the computational core of the app.
-It registers `shinyhelper::observe_helpers()` once per session (required by
-shinyhelper; do not call it separately in `app_server()`), then chains four
-reactives triggered by `inputs_r()$fetch`:
+**`mod_outputs_server(id, inputs_r)` is the computational core of the app**. It registers `shinyhelper::observe_helpers()` once per session (required by `shinyhelper`; do not call it separately in `app_server()`), then chains four reactives triggered by `inputs_r()$fetch`:
 
 ```{r}
 # 1 — fetch adjusted prices
@@ -180,12 +165,11 @@ perf_r <- shiny::reactive({
 # 4 — five renderUI / renderReactable outputs that consume perf_r()
 ```
 
-`perf_r` is returned to `app_server()` so `mod_download_server()` can embed
-it in the rendered report without re-computing it.
+`perf_r` is returned to `app_server()` so `mod_download_server()` can embed it in the rendered report without re-computing it.
 
 ### KPI value boxes
 
-The value boxes are coloured by Sharpe ratio threshold:
+The value boxes are colored by Sharpe ratio threshold:
 
 ```{r}
 theme <- if (sharpe >= 1) "success" else if (sharpe >= 0) "warning" else "danger"
@@ -193,9 +177,7 @@ theme <- if (sharpe >= 1) "success" else if (sharpe >= 0) "warning" else "danger
 
 ### reactable tab and `mod_hoverinfo()`
 
-The reactable tab is the only output that uses `mod_hoverinfo()`.  Each
-numeric column in the performance table gets a `colDef` cell renderer that
-wraps the formatted value in an `htmltools` `<span title="...">`:
+The `reactable` tab is the only output that uses `mod_hoverinfo()`. Each numeric column in the performance table gets a `colDef` cell renderer that wraps the formatted value in an `htmltools` `<span title="...">`:
 
 ```{r}
 reactable::colDef(
@@ -217,21 +199,21 @@ reactable::colDef(
 )
 ```
 
----
+------------------------------------------------------------------------
 
-## mod_download
+## Downloads: mod_download
 
-**Files:** `R/mod_download.R`  
+**Files:** `R/mod_download.R`\
 **Exports:** `mod_download_ui()`, `mod_download_server()`
 
-### UI
+### UI function
 
 `mod_download_ui(id)` returns a `bslib::card()` with:
 
 - `selectInput` — report format (`"html"` or `"pdf"`)
 - `downloadButton` — triggers the handler
 
-The card is embedded at the bottom of the inputs sidebar by `mod_inputs_ui()`:
+The `card` is embedded at the bottom of the inputs sidebar by `mod_inputs_ui()`:
 
 ```{r}
 # inside mod_inputs_ui()
@@ -241,15 +223,13 @@ bslib::sidebar(
 )
 ```
 
-This keeps all user controls in the sidebar while the download server is
-wired at the top level in `app_server()`.
+This keeps all user controls in the sidebar while the download server is wired at the top level in `app_server()`.
 
 ### Server
 
-`mod_download_server(id, inputs_r, perf_r)` renders
-`inst/report_template.Rmd` into a temporary directory via
-`rmarkdown::render()` and serves the output through
-`shiny::downloadHandler()`.  Parameters passed to the template:
+`mod_download_server(id, inputs_r, perf_r)` renders `inst/report_template.Rmd` into a temporary directory via `rmarkdown::render()` and serves the output through `shiny::downloadHandler()`.
+
+Below are the parameters passed to the template:
 
 ```{r}
 params = list(
@@ -261,10 +241,9 @@ params = list(
 )
 ```
 
-Rendering into an isolated `tempfile()` directory ensures the Shiny session
-working directory is not affected and simultaneous downloads do not collide.
+Rendering into an isolated `tempfile()` directory ensures the Shiny session working directory is not affected and simultaneous downloads do not collide.
 
----
+------------------------------------------------------------------------
 
 ## Tooltip helpers
 
@@ -272,8 +251,7 @@ These two functions share the `mod_` prefix but are not Shiny modules.
 
 ### `mod_tooltip()`
 
-A **UI helper** — returns a `shiny.tag` with no server counterpart.  Place it
-anywhere inside a UI tree, including inside `renderUI()`.
+A **UI helper** — returns a `shiny.tag` with no server counterpart. Place it anywhere inside a UI tree, including inside `renderUI()`.
 
 ```{r}
 mod_tooltip(
@@ -291,8 +269,7 @@ mod_tooltip(
 
 ### `mod_hoverinfo()`
 
-A **rendering helper** — returns an `htmltools` `<span title="...">` for use
-inside `reactable::colDef(cell = ..., html = TRUE)`.
+A **rendering helper** — returns an `htmltools` `<span title="...">` for use inside `reactable::colDef(cell = ..., html = TRUE)`.
 
 ```{r}
 mod_hoverinfo(
@@ -305,14 +282,13 @@ mod_hoverinfo(
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ## Adding a new module
 
 Follow these steps to add a fourth module to the app.
 
-**1.** Create `R/mod_<name>.R` with `mod_<name>_ui()` and
-`mod_<name>_server()`, both exported with `@export`.
+**1.** Create `R/mod_<name>.R` with `mod_<name>_ui()` and `mod_<name>_server()`, both exported with `@export`.
 
 **2.** Add the UI call to `app_ui()`:
 
@@ -332,5 +308,4 @@ bslib::page_sidebar(
 mod_<name>_server("<name>", inputs_r, perf_r)
 ```
 
-**4.** Run `devtools::document()` to update `NAMESPACE` and regenerate the
-help page, then `pkgdown::build_site()` to update the reference index.
+**4.** Run `devtools::document()` to update `NAMESPACE` and regenerate the help page, then `pkgdown::build_site()` to update the reference index.

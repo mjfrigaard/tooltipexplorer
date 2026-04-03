@@ -8,6 +8,10 @@
 #' The default threshold is `INFO` — `TRACE` and `DEBUG` lines are silent
 #' in production.
 #'
+#' Internally, `lapply()` iterates over the namespace vector and calls
+#' [logger::log_threshold()] for each entry.  The return value of `lapply()`
+#' is discarded; only `level` is returned (invisibly).
+#'
 #' @param level A `logger` log-level object, e.g. [logger::DEBUG],
 #'   [logger::INFO] (default), [logger::WARN].
 #'
@@ -33,8 +37,6 @@ app_set_log_threshold <- function(level = logger::INFO) {
     "tooltipexplorer/tooltip",
     "tooltipexplorer/hoverinfo"
   )
-  for (ns in namespaces) {
-    logger::log_threshold(level, namespace = ns)
-  }
+  lapply(namespaces, \(ns) logger::log_threshold(level, namespace = ns))
   invisible(level)
 }
