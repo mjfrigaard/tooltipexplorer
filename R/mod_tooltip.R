@@ -4,9 +4,9 @@
 #' behind a single, consistent interface.  Drop it anywhere inside a UI or
 #' another module — no paired server function is required.
 #' 
-#' @section App UI: 
-#' `mod_tooltip()` with `type = "shinyalert"`` requires a delegated `jQuery` 
-#' click handler injected into the page. I.e., in `app_ui.R`:
+#' @section `shinyalert` usage in UI: 
+#' To use `mod_tooltip()` with `type = "shinyalert"` requires a delegated
+#' `jQuery` click handler injected into the page. I.e., in `app_ui.R`:
 #' 
 #' ```r
 #' shiny::tags$script(shiny::HTML("
