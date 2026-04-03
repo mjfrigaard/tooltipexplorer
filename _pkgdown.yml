@@ -2,3 +2,64 @@ url: https://mjfrigaard.github.io/tooltipexplorer/
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+
+articles:
+  - title: "Getting started"
+    navbar: ~
+    contents:
+      - tooltips-hover-info
+  - title: "Deep dives"
+    navbar: ~
+    contents:
+      - modules
+      - logger-namespaces
+
+reference:
+  - title: "App"
+    desc: "Entry points for creating and running the Shiny application."
+    contents:
+      - launch
+      - app_ui
+      - app_server
+
+  - title: "Modules"
+    desc: >
+      Shiny modules following the `mod_<name>_ui()` / `mod_<name>_server()`
+      convention. Each pair is co-located in a single `mod_<name>.R` file.
+    contents:
+      - mod_inputs_ui
+      - mod_inputs_server
+      - mod_outputs_ui
+      - mod_outputs_server
+      - mod_download_ui
+      - mod_download_server
+
+  - title: "Tooltip helpers"
+    desc: >
+      UI and rendering helpers for attaching tooltip and hover content.
+      `mod_tooltip()` targets UI elements; `mod_hoverinfo()` targets
+      `reactable` table cells.
+    contents:
+      - mod_tooltip
+      - mod_hoverinfo
+
+  - title: "Logic"
+    desc: "Financial data retrieval and transformation functions."
+    contents:
+      - get_stock_prices
+      - get_stock_returns
+      - get_ff3_factors
+      - compute_rolling_vol
+      - summarise_performance
+      - default_tickers
+
+  - title: "Utilities"
+    desc: "Logging helpers and operators."
+    contents:
+      - app_set_log_threshold
+      - with_logging
+      - "%||%"
