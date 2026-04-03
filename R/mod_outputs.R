@@ -1,23 +1,16 @@
-#' Outputs module (UI)
+#' Outputs module UI
 #'
-#' Main content area: KPI value boxes and tabbed panels for each
-#' tooltip/hover demo (bslib, shinyhelper, prompter, shinyalert, reactable).
-#'
-#' @section UI:
-#' `mod_outputs_ui()` returns a `shiny::tagList()` containing a
-#' `shiny::uiOutput()` for KPI boxes and a `bslib::navset_card_tab()` for
-#' the demo panels.
-#'
-#' @section Server:
-#' `mod_outputs_server()` reacts to the fetch signal from
-#' [mod_inputs_server()], downloads price data, computes returns and
-#' performance metrics, and renders all tooltip-demo outputs.  Calls
-#' `shinyhelper::observe_helpers()` internally — do not call it separately
-#' in `app_server()`.  Returns the reactive performance-summary tibble
-#' (`perf_r`) for the download module.
+#' Main content area: a `shiny::uiOutput()` for KPI value boxes and a
+#' [bslib::navset_card_tab()] with one tab per tooltip/hover-info demo
+#' (bslib, shinyhelper, prompter, shinyalert, reactable).
 #'
 #' @param id Module namespace id.
 #'
+#' @return A `shiny::tagList()` ready to embed in [app_ui()].
+#'
+#' @seealso [mod_outputs_server()]
+#'
+#' @export
 mod_outputs_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -86,35 +79,32 @@ mod_outputs_ui <- function(id) {
           class = "text-muted mb-3"
         ),
         reactable::reactableOutput(ns("reactable_perf"))
-      ),
-
+      )
     )
   )
 }
 
-# -- Server -------------------------------------------------------------------
-
-#' Outputs module (server)
+#' Outputs module server
 #'
-#' Main content area: KPI value boxes and tabbed panels for each
-#' tooltip/hover demo (bslib, shinyhelper, prompter, shinyalert, reactable).
+#' Reacts to the fetch signal from [mod_inputs_server()], downloads adjusted
+#' price data via [get_stock_prices()], computes daily log returns with
+#' [get_stock_returns()], and summarises performance metrics with
+#' [summarise_performance()].  Renders all five tooltip-demo outputs (KPI
+#' boxes, bslib, shinyhelper, prompter, shinyalert, reactable) and returns
+#' the reactive performance-summary tibble for use by [mod_download_server()].
 #'
-#' @section UI:
-#' `mod_outputs_ui()` returns a `shiny::tagList()` containing a
-#' `shiny::uiOutput()` for KPI boxes and a `bslib::navset_card_tab()` for
-#' the demo panels.
-#'
-#' @section Server:
-#' `mod_outputs_server()` reacts to the fetch signal from
-#' [mod_inputs_server()], downloads price data, computes returns and
-#' performance metrics, and renders all tooltip-demo outputs.  Calls
-#' `shinyhelper::observe_helpers()` internally — do not call it separately
-#' in `app_server()`.  Returns the reactive performance-summary tibble
-#' (`perf_r`) for the download module.
+#' Calls `shinyhelper::observe_helpers()` internally — do **not** call it
+#' separately in [app_server()].
 #'
 #' @param id       Module namespace id.
 #' @param inputs_r Reactive list returned by [mod_inputs_server()].
 #'
+#' @return A reactive tibble with columns `symbol`, `ann_return`, `ann_vol`,
+#'   and `sharpe` — the output of [summarise_performance()].
+#'
+#' @seealso [mod_outputs_ui()]
+#'
+#' @export
 mod_outputs_server <- function(id, inputs_r) {
   shiny::moduleServer(id, function(input, output, session) {
 
@@ -315,7 +305,6 @@ mod_outputs_server <- function(id, inputs_r) {
             row <- df[i, ]
 
             # Plain-text vector: helper(type = "inline") joins with <br>.
-            # HTML tags in content cause double-escaping in data-modal-content.
             help_content <- c(
               row$symbol,
               paste0("Ann. Return: ", scales::percent(row$ann_return, accuracy = 0.1)),
@@ -326,7 +315,7 @@ mod_outputs_server <- function(id, inputs_r) {
             bslib::card(
               class = "text-center p-3",
               mod_tooltip(
-                trigger  = shiny::tags$span(class = "fs-4 fw-bold", row$symbol),
+                trigger     = shiny::tags$span(class = "fs-4 fw-bold", row$symbol),
                 type        = "shinyhelper",
                 contents    = help_content,
                 helper_type = "inline",

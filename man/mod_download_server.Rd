@@ -2,29 +2,26 @@
 % Please edit documentation in R/mod_download.R
 \name{mod_download_server}
 \alias{mod_download_server}
-\title{Download module (server)}
+\title{Download module server}
 \usage{
 mod_download_server(id, inputs_r, perf_r)
 }
 \arguments{
 \item{id}{Module namespace id.}
 
-\item{inputs_r}{Reactive list from \code{\link[=mod_inputs_server]{mod_inputs_server()}}.}
+\item{inputs_r}{Reactive list returned by \code{\link[=mod_inputs_server]{mod_inputs_server()}}.}
 
-\item{perf_r}{Reactive tibble from \code{\link[=mod_outputs_server]{mod_outputs_server()}}.}
+\item{perf_r}{Reactive tibble returned by \code{\link[=mod_outputs_server]{mod_outputs_server()}}.}
+}
+\value{
+Called for side-effects; returns \code{NULL} invisibly.
 }
 \description{
-A \code{bslib::card()} containing a format selector (HTML / PDF) and a
-download button for exporting a parameterised performance report.
+Renders a parameterised R Markdown report from
+\code{inst/report_template.Rmd} and serves it as a file download.  The report
+is rendered into an isolated temporary directory so the working directory
+of the Shiny session is not affected.
 }
-\section{UI}{
-
-\code{mod_download_ui()} returns a \code{bslib::card()}.
+\seealso{
+\code{\link[=mod_download_ui]{mod_download_ui()}}
 }
-
-\section{Server}{
-
-\code{mod_download_server()} renders a parameterised R Markdown report from
-\code{inst/report_template.Rmd} and serves it as a file download.
-}
-

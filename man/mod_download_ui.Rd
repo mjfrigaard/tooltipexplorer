@@ -2,25 +2,20 @@
 % Please edit documentation in R/mod_download.R
 \name{mod_download_ui}
 \alias{mod_download_ui}
-\title{Download module (UI)}
+\title{Download module UI}
 \usage{
 mod_download_ui(id)
 }
 \arguments{
 \item{id}{Module namespace id.}
 }
+\value{
+A \code{bslib::card} tag object.
+}
 \description{
-A \code{bslib::card()} containing a format selector (HTML / PDF) and a
-download button for exporting a parameterised performance report.
+A \code{\link[bslib:card]{bslib::card()}} containing a report-format selector (HTML / PDF) and a
+download button.  Embed inside the sidebar via \code{\link[=mod_inputs_ui]{mod_inputs_ui()}}.
 }
-\section{UI}{
-
-\code{mod_download_ui()} returns a \code{bslib::card()}.
+\seealso{
+\code{\link[=mod_download_server]{mod_download_server()}}
 }
-
-\section{Server}{
-
-\code{mod_download_server()} renders a parameterised R Markdown report from
-\code{inst/report_template.Rmd} and serves it as a file download.
-}
-

@@ -2,31 +2,21 @@
 % Please edit documentation in R/mod_outputs.R
 \name{mod_outputs_ui}
 \alias{mod_outputs_ui}
-\title{Outputs module (UI)}
+\title{Outputs module UI}
 \usage{
 mod_outputs_ui(id)
 }
 \arguments{
 \item{id}{Module namespace id.}
 }
+\value{
+A \code{shiny::tagList()} ready to embed in \code{\link[=app_ui]{app_ui()}}.
+}
 \description{
-Main content area: KPI value boxes and tabbed panels for each
-tooltip/hover demo (bslib, shinyhelper, prompter, shinyalert, reactable).
+Main content area: a \code{shiny::uiOutput()} for KPI value boxes and a
+\code{\link[bslib:navset]{bslib::navset_card_tab()}} with one tab per tooltip/hover-info demo
+(bslib, shinyhelper, prompter, shinyalert, reactable).
 }
-\section{UI}{
-
-\code{mod_outputs_ui()} returns a \code{shiny::tagList()} containing a
-\code{shiny::uiOutput()} for KPI boxes and a \code{bslib::navset_card_tab()} for
-the demo panels.
+\seealso{
+\code{\link[=mod_outputs_server]{mod_outputs_server()}}
 }
-
-\section{Server}{
-
-\code{mod_outputs_server()} reacts to the fetch signal from
-\code{\link[=mod_inputs_server]{mod_inputs_server()}}, downloads price data, computes returns and
-performance metrics, and renders all tooltip-demo outputs.  Calls
-\code{shinyhelper::observe_helpers()} internally — do not call it separately
-in \code{app_server()}.  Returns the reactive performance-summary tibble
-(\code{perf_r}) for the download module.
-}
-

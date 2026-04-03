@@ -37,6 +37,7 @@
 #' )
 #' }
 #'
+#' @export
 mod_hoverinfo <- function(
     type     = "reactable",
     contents = character(0),

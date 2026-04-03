@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_outputs.R
 \name{mod_outputs_server}
 \alias{mod_outputs_server}
-\title{Outputs module (server)}
+\title{Outputs module server}
 \usage{
 mod_outputs_server(id, inputs_r)
 }
@@ -11,24 +11,22 @@ mod_outputs_server(id, inputs_r)
 
 \item{inputs_r}{Reactive list returned by \code{\link[=mod_inputs_server]{mod_inputs_server()}}.}
 }
+\value{
+A reactive tibble with columns \code{symbol}, \code{ann_return}, \code{ann_vol},
+and \code{sharpe} — the output of \code{\link[=summarise_performance]{summarise_performance()}}.
+}
 \description{
-Main content area: KPI value boxes and tabbed panels for each
-tooltip/hover demo (bslib, shinyhelper, prompter, shinyalert, reactable).
+Reacts to the fetch signal from \code{\link[=mod_inputs_server]{mod_inputs_server()}}, downloads adjusted
+price data via \code{\link[=get_stock_prices]{get_stock_prices()}}, computes daily log returns with
+\code{\link[=get_stock_returns]{get_stock_returns()}}, and summarises performance metrics with
+\code{\link[=summarise_performance]{summarise_performance()}}.  Renders all five tooltip-demo outputs (KPI
+boxes, bslib, shinyhelper, prompter, shinyalert, reactable) and returns
+the reactive performance-summary tibble for use by \code{\link[=mod_download_server]{mod_download_server()}}.
 }
-\section{UI}{
-
-\code{mod_outputs_ui()} returns a \code{shiny::tagList()} containing a
-\code{shiny::uiOutput()} for KPI boxes and a \code{bslib::navset_card_tab()} for
-the demo panels.
+\details{
+Calls \code{shinyhelper::observe_helpers()} internally — do \strong{not} call it
+separately in \code{\link[=app_server]{app_server()}}.
 }
-
-\section{Server}{
-
-\code{mod_outputs_server()} reacts to the fetch signal from
-\code{\link[=mod_inputs_server]{mod_inputs_server()}}, downloads price data, computes returns and
-performance metrics, and renders all tooltip-demo outputs.  Calls
-\code{shinyhelper::observe_helpers()} internally — do not call it separately
-in \code{app_server()}.  Returns the reactive performance-summary tibble
-(\code{perf_r}) for the download module.
+\seealso{
+\code{\link[=mod_outputs_ui]{mod_outputs_ui()}}
 }
-

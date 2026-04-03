@@ -2,26 +2,27 @@
 % Please edit documentation in R/mod_inputs.R
 \name{mod_inputs_server}
 \alias{mod_inputs_server}
-\title{Inputs module (server)}
+\title{Inputs module server}
 \usage{
 mod_inputs_server(id)
 }
 \arguments{
 \item{id}{Module namespace id.}
 }
+\value{
+A reactive list with elements:
+\describe{
+\item{\code{tickers}}{Character vector of selected ticker symbols.}
+\item{\code{from}}{\code{Date}. Start of the selected date range.}
+\item{\code{to}}{\code{Date}. End of the selected date range.}
+\item{\code{vol_window}}{Integer. Rolling-volatility window in trading days.}
+\item{\code{fetch}}{Integer. Current value of the fetch action button.}
+}
+}
 \description{
-Sidebar controls for ticker selection, date range, rolling-vol window,
-and report download.
+Handles the fetch button observer and assembles a reactive list of current
+user inputs.
 }
-\section{UI}{
-
-\code{mod_inputs_ui()} returns a \code{bslib::sidebar()} ready to embed in a
-\code{bslib::page_sidebar()} layout.
+\seealso{
+\code{\link[=mod_inputs_ui]{mod_inputs_ui()}}
 }
-
-\section{Server}{
-
-\code{mod_inputs_server()} returns a reactive list with elements: \code{tickers},
-\code{from}, \code{to}, \code{vol_window}, and \code{fetch} (the action-button integer).
-}
-

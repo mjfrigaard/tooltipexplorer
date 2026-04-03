@@ -79,6 +79,7 @@
 #' )
 #' }
 #'
+#' @export
 mod_tooltip <- function(
     trigger     = bsicons::bs_icon("info-circle"),
     type        = c("bslib", "shinyhelper", "prompter", "shinyalert"),
@@ -130,8 +131,6 @@ mod_tooltip <- function(
       },
 
       # ── shinyhelper ────────────────────────────────────────────────────────
-      # helper_type and helper_size are dedicated params so they never clash
-      # with mod_tooltip()'s own `type` or CSS `size` params.
       shinyhelper = {
         logger::log_debug(
           "mod_tooltip() dispatching to shinyhelper::helper() | helper_type: {helper_type} | helper_size: {helper_size}",
@@ -160,11 +159,6 @@ mod_tooltip <- function(
       },
 
       # ── shinyalert ─────────────────────────────────────────────────────────
-      # Content is stored in data-sa-* attributes rather than an onclick JS
-      # string.  htmltools HTML-escapes attribute values, but the browser's
-      # dataset API automatically decodes those entities before the delegated
-      # jQuery handler (injected once in app_ui()) reads them via $(el).data().
-      # This avoids the &quot; / &lt; escaping that breaks inline JS strings.
       shinyalert = {
         logger::log_debug(
           "mod_tooltip() dispatching to shinyalert (data-* attrs) | alert_type: {alert_type}",

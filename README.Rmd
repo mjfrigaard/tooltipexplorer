@@ -1,0 +1,120 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file. -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.path  = "man/figures/README-",
+  out.width = "100%",
+  eval      = FALSE
+)
+```
+
+# tooltipexplorer
+
+**tooltipexplorer** is a Shiny application-package for demoing and comparing
+five tooltip and hover-info approaches in R, powered by real financial data
+from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and
+[tidyquant](https://business-science.github.io/tidyquant/).
+
+## Installation
+
+Install the development version from GitHub:
+
+```{r install}
+# install.packages("pak")
+pak::pak("mjfrigaard/tooltipexplorer")
+```
+
+## Quick start
+
+```{r launch}
+library(tooltipexplorer)
+
+# Launch the Shiny app
+launch()
+```
+
+Use the sidebar to select tickers and a date range, then click **Fetch data**.
+Each of the five tabs demonstrates a different tooltip or hover-info approach.
+
+## Tooltip back-ends
+
+| Tab | Package | Interaction | Helper |
+|---|---|---|---|
+| **bslib** | `bslib::popover()` | Click | `mod_tooltip(type = "bslib")` |
+| **shinyhelper** | `shinyhelper::helper()` | Click | `mod_tooltip(type = "shinyhelper")` |
+| **prompter** | `prompter::add_prompt()` | Hover | `mod_tooltip(type = "prompter")` |
+| **shinyalert** | `shinyalert` + delegated JS | Click | `mod_tooltip(type = "shinyalert")` |
+| **reactable** | native `title` attribute | Hover | `mod_hoverinfo(type = "reactable")` |
+
+## Data utilities
+
+The package exports a small set of financial data helpers you can use outside
+Shiny:
+
+```{r data-utils}
+prices  <- get_stock_prices(c("AAPL", "MSFT"), from = "2024-01-01")
+returns <- get_stock_returns(prices)
+perf    <- summarise_performance(returns)
+vol     <- compute_rolling_vol(returns, window = 30L)
+
+# Fama-French 3-factor data
+ff3 <- get_ff3_factors("2020-01-01", "2023-12-31")
+```
+
+## Tooltip helpers
+
+`mod_tooltip()` provides a single interface across all click/hover back-ends:
+
+```{r mod-tooltip}
+# bslib popover (click)
+mod_tooltip(
+  type     = "bslib",
+  contents = "Annualised log return = mean daily log return \u00d7 252.",
+  title    = "Ann. Return"
+)
+
+# prompter attribute tooltip (hover)
+mod_tooltip(
+  trigger  = shiny::tags$span("Ann. Vol"),
+  type     = "prompter",
+  contents = "Annualised volatility = SD of daily log returns \u00d7 \u221a252.",
+  position = "right"
+)
+```
+
+`mod_hoverinfo()` formats hover content for `reactable` table cells:
+
+```{r mod-hoverinfo}
+reactable::colDef(
+  name = "Ann. Return (%)",
+  html = TRUE,
+  cell = function(value, index) {
+    mod_hoverinfo(
+      type     = "reactable",
+      contents = glue::glue("Annualised log return for {df$symbol[index]}: {value}%"),
+      display  = glue::glue("{value}%"),
+      style    = paste0("color:", if (value >= 0) "#198754" else "#dc3545", "; cursor:help")
+    )
+  }
+)
+```
+
+## Logging
+
+All modules use the `logger` package.  Set the threshold once at session start:
+
+```{r logging}
+app_set_log_threshold(logger::DEBUG)  # verbose (development)
+app_set_log_threshold(logger::WARN)   # quiet   (production)
+```
+
+## Learn more
+
+See `vignette("tooltips-hover-info", package = "tooltipexplorer")` for a full
+walkthrough of the app architecture, module API, and each tooltip back-end.

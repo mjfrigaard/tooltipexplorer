@@ -1,17 +1,15 @@
-#' Download module (UI)
+#' Download module UI
 #'
-#' A `bslib::card()` containing a format selector (HTML / PDF) and a
-#' download button for exporting a parameterised performance report.
-#'
-#' @section UI:
-#' `mod_download_ui()` returns a `bslib::card()`.
-#'
-#' @section Server:
-#' `mod_download_server()` renders a parameterised R Markdown report from
-#' `inst/report_template.Rmd` and serves it as a file download.
+#' A [bslib::card()] containing a report-format selector (HTML / PDF) and a
+#' download button.  Embed inside the sidebar via [mod_inputs_ui()].
 #'
 #' @param id Module namespace id.
 #'
+#' @return A `bslib::card` tag object.
+#'
+#' @seealso [mod_download_server()]
+#'
+#' @export
 mod_download_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -36,22 +34,22 @@ mod_download_ui <- function(id) {
   )
 }
 
-#' Download module (server)
+#' Download module server
 #'
-#' A `bslib::card()` containing a format selector (HTML / PDF) and a
-#' download button for exporting a parameterised performance report.
-#'
-#' @section UI:
-#' `mod_download_ui()` returns a `bslib::card()`.
-#'
-#' @section Server:
-#' `mod_download_server()` renders a parameterised R Markdown report from
-#' `inst/report_template.Rmd` and serves it as a file download.
+#' Renders a parameterised R Markdown report from
+#' `inst/report_template.Rmd` and serves it as a file download.  The report
+#' is rendered into an isolated temporary directory so the working directory
+#' of the Shiny session is not affected.
 #'
 #' @param id       Module namespace id.
-#' @param inputs_r Reactive list from [mod_inputs_server()].
-#' @param perf_r   Reactive tibble from [mod_outputs_server()].
+#' @param inputs_r Reactive list returned by [mod_inputs_server()].
+#' @param perf_r   Reactive tibble returned by [mod_outputs_server()].
 #'
+#' @return Called for side-effects; returns `NULL` invisibly.
+#'
+#' @seealso [mod_download_ui()]
+#'
+#' @export
 mod_download_server <- function(id, inputs_r, perf_r) {
   shiny::moduleServer(id, function(input, output, session) {
 
@@ -67,8 +65,8 @@ mod_download_server <- function(id, inputs_r, perf_r) {
           context = "mod_download / filename",
           ns      = "tooltipexplorer/download",
           {
-            ts  <- format(Sys.time(), "%Y%m%d_%H%M%S")
-            ext <- if (input$format == "html") "html" else "pdf"
+            ts    <- format(Sys.time(), "%Y%m%d_%H%M%S")
+            ext   <- if (input$format == "html") "html" else "pdf"
             fname <- glue::glue("tooltipexplorer_report_{ts}.{ext}")
             logger::log_info(
               "Download filename generated | file: {fname}",

@@ -30,45 +30,46 @@ app_ui <- function() {
 
       # ── HEAD extras ─────────────────────────────────────────────────────
       shiny::tags$head(
-        # Load shinyalert JS library unconditionally — required for the
-        # delegated .sa-trigger handler below, which calls shinyalert()
-        # directly from JS without going through the R server function.
+        # shinyalert JS — required for the delegated .sa-trigger handler.
         shinyalert::useShinyalert(force = TRUE),
 
         # Delegated shinyalert handler — reads content from data-sa-* attrs.
-        # The browser dataset API decodes HTML entities automatically, so
-        # storing HTML in data-sa-text is safe and avoids onclick escaping.
         shiny::tags$script(htmltools::HTML(
           "$(document).on('click', '.sa-trigger', function () {",
           "  var d = $(this).data();",
           "  swal({",
-          "    title:            d.saTitle || '',",
-          "    text:             d.saText  || '',",
-          "    type:             d.saType  || 'info',",
-          "    html:             true,",
-          "    confirmButtonText: d.saBtn  || 'OK'",
+          "    title:             d.saTitle || '',",
+          "    text:              d.saText  || '',",
+          "    type:              d.saType  || 'info',",
+          "    html:              true,",
+          "    confirmButtonText: d.saBtn   || 'OK'",
           "  });",
           "});"
         )),
 
-        # Delegated shinyhelper click handler — replaces the direct .on()
-        # binding in shinyhelper.js, which only captures icons present at
-        # bind time and misses icons injected by renderUI.
+        # Delegated shinyhelper handler.
+        #
+        # shinyhelper's own .on('click', '.shinyhelper-icon') binding runs
+        # once at page load, so it misses icons injected later by renderUI.
+        # This document-level delegated handler catches every click regardless
+        # of when the icon was inserted, stops the (now-duplicate) built-in
+        # handler via stopImmediatePropagation(), then sets the same input
+        # that shinyhelper's observe_helpers() observeEvent listens on.
+        # {priority: 'event'} ensures re-firing when the same ticker is
+        # clicked twice in a row (identical value would otherwise be dropped).
         shiny::tags$script(htmltools::HTML(
-          "$(document).on('click', '.shinyhelper-icon', function () {",
-          "  var data = this.dataset;",
-          "  var nonce = Math.random();",
-          "  var modal_params = {",
-          "    size:      data.modalSize,",
-          "    type:      data.modalType,",
-          "    title:     data.modalTitle,",
-          "    content:   data.modalContent,",
-          "    label:     data.modalLabel,",
-          "    easyClose: data.modalEasyclose,",
-          "    fade:      data.modalFade,",
-          "    nonce:     nonce",
-          "  };",
-          "  Shiny.onInputChange('shinyhelper-modal_params', modal_params);",
+          "$(document).on('click', '.shinyhelper-icon', function(e) {",
+          "  e.stopImmediatePropagation();",
+          "  var d = $(this).data();",
+          "  Shiny.setInputValue('shinyhelper_params', {",
+          "    size:      d.modalSize,",
+          "    type:      d.modalType,",
+          "    title:     d.modalTitle,",
+          "    content:   d.modalContent,",
+          "    label:     d.modalLabel,",
+          "    easyClose: d.modalEasyclose,",
+          "    fade:      d.modalFade",
+          "  }, {priority: 'event'});",
           "});"
         ))
       ),
@@ -87,7 +88,7 @@ app_ui <- function() {
           shiny::tags$div(
             shiny::tags$strong("Tooltip Explorer"),
             shiny::tags$span(
-              " \u2014 explore six tooltip/hover-info approaches in R using real",
+              " \u2014 explore five tooltip/hover-info approaches in R using real",
               " financial data from ",
               shiny::tags$a(
                 href   = "https://www.tidy-finance.org/r/",

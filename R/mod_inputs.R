@@ -1,18 +1,16 @@
-#' Inputs module (UI)
+#' Inputs module UI
 #'
 #' Sidebar controls for ticker selection, date range, rolling-vol window,
-#' and report download.
-#'
-#' @section UI:
-#' `mod_inputs_ui()` returns a `bslib::sidebar()` ready to embed in a
-#' `bslib::page_sidebar()` layout.
-#'
-#' @section Server:
-#' `mod_inputs_server()` returns a reactive list with elements: `tickers`,
-#' `from`, `to`, `vol_window`, and `fetch` (the action-button integer).
+#' and report download.  Returns a [bslib::sidebar()] ready to embed in a
+#' [bslib::page_sidebar()] layout.
 #'
 #' @param id Module namespace id.
 #'
+#' @return A `bslib::sidebar` tag object.
+#'
+#' @seealso [mod_inputs_server()]
+#'
+#' @export
 mod_inputs_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -88,23 +86,25 @@ mod_inputs_ui <- function(id) {
   )
 }
 
-# ── Server ────────────────────────────────────────────────────────────────────
-
-#' Inputs module (server)
+#' Inputs module server
 #'
-#' Sidebar controls for ticker selection, date range, rolling-vol window,
-#' and report download.
-#'
-#' @section UI:
-#' `mod_inputs_ui()` returns a `bslib::sidebar()` ready to embed in a
-#' `bslib::page_sidebar()` layout.
-#'
-#' @section Server:
-#' `mod_inputs_server()` returns a reactive list with elements: `tickers`,
-#' `from`, `to`, `vol_window`, and `fetch` (the action-button integer).
+#' Handles the fetch button observer and assembles a reactive list of current
+#' user inputs.
 #'
 #' @param id Module namespace id.
 #'
+#' @return A reactive list with elements:
+#'   \describe{
+#'     \item{`tickers`}{Character vector of selected ticker symbols.}
+#'     \item{`from`}{`Date`. Start of the selected date range.}
+#'     \item{`to`}{`Date`. End of the selected date range.}
+#'     \item{`vol_window`}{Integer. Rolling-volatility window in trading days.}
+#'     \item{`fetch`}{Integer. Current value of the fetch action button.}
+#'   }
+#'
+#' @seealso [mod_inputs_ui()]
+#'
+#' @export
 mod_inputs_server <- function(id) {
   shiny::moduleServer(id, function(input, output, session) {
 

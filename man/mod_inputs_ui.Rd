@@ -2,26 +2,21 @@
 % Please edit documentation in R/mod_inputs.R
 \name{mod_inputs_ui}
 \alias{mod_inputs_ui}
-\title{Inputs module (UI)}
+\title{Inputs module UI}
 \usage{
 mod_inputs_ui(id)
 }
 \arguments{
 \item{id}{Module namespace id.}
 }
+\value{
+A \code{bslib::sidebar} tag object.
+}
 \description{
 Sidebar controls for ticker selection, date range, rolling-vol window,
-and report download.
+and report download.  Returns a \code{\link[bslib:sidebar]{bslib::sidebar()}} ready to embed in a
+\code{\link[bslib:page_sidebar]{bslib::page_sidebar()}} layout.
 }
-\section{UI}{
-
-\code{mod_inputs_ui()} returns a \code{bslib::sidebar()} ready to embed in a
-\code{bslib::page_sidebar()} layout.
+\seealso{
+\code{\link[=mod_inputs_server]{mod_inputs_server()}}
 }
-
-\section{Server}{
-
-\code{mod_inputs_server()} returns a reactive list with elements: \code{tickers},
-\code{from}, \code{to}, \code{vol_window}, and \code{fetch} (the action-button integer).
-}
-
