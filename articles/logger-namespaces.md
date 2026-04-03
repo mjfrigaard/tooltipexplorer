@@ -1,0 +1,345 @@
+# Logging with logger: namespaces and thresholds
+
+**tooltipexplorer** uses the
+[`logger`](https://daroczig.github.io/logger/) package for structured,
+namespace-aware logging throughout the application. Every log call
+carries a `namespace` argument that identifies exactly which module or
+layer emitted the message, making it straightforward to filter noise in
+development and route messages selectively in production.
+
+------------------------------------------------------------------------
+
+## Log-level hierarchy
+
+`logger` defines seven levels from most to least verbose:
+
+| Level     | Function        | When to use                                                  |
+|-----------|-----------------|--------------------------------------------------------------|
+| `TRACE`   | `log_trace()`   | Fine-grained internal steps (loops, branches)                |
+| `DEBUG`   | `log_debug()`   | Per-reactive / per-call diagnostics                          |
+| `INFO`    | `log_info()`    | Key lifecycle events (session start, fetch, render complete) |
+| `SUCCESS` | `log_success()` | Explicit success confirmations                               |
+| `WARN`    | `log_warn()`    | Recoverable issues (empty ticker list, unexpected input)     |
+| `ERROR`   | `log_error()`   | Caught errors before re-throwing                             |
+| `FATAL`   | `log_fatal()`   | Unrecoverable failures                                       |
+
+The package default threshold is `INFO`: `DEBUG` and `TRACE` lines are
+silent unless you explicitly lower the threshold.
+
+------------------------------------------------------------------------
+
+## Namespaces in this package
+
+Every `logger::log_*()` call in **tooltipexplorer** passes an explicit
+`namespace` string. The full set, registered in
+[`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md),
+is:
+
+| Namespace                     | File                       | Covers                                              |
+|-------------------------------|----------------------------|-----------------------------------------------------|
+| `"global"`                    | —                          | logger’s built-in global namespace (fallback)       |
+| `"tooltipexplorer/app"`       | `app_ui.R`, `app_server.R` | UI construction, session lifecycle, module wiring   |
+| `"tooltipexplorer/inputs"`    | `mod_inputs.R`             | Fetch-button events, reactive inputs list           |
+| `"tooltipexplorer/outputs"`   | `mod_outputs.R`            | Price fetch, returns, performance, all render calls |
+| `"tooltipexplorer/download"`  | `mod_download.R`           | Filename generation, report render                  |
+| `"tooltipexplorer/tooltip"`   | `mod_tooltip.R`            | Tooltip helper dispatch                             |
+| `"tooltipexplorer/hoverinfo"` | `mod_hoverinfo.R`          | Hover-span construction                             |
+
+The `"tooltipexplorer/<module>"` convention means you can silence one
+noisy module while keeping the others verbose — see the examples below.
+
+------------------------------------------------------------------------
+
+## `app_set_log_threshold()`
+
+This is the single entry point for changing thresholds. It is called
+once per session in
+[`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
+and applies the same level to every namespace in the table above.
+
+``` r
+app_set_log_threshold <- function(level = logger::INFO) {
+  namespaces <- c(
+    "global",
+    "tooltipexplorer/app",
+    "tooltipexplorer/inputs",
+    "tooltipexplorer/outputs",
+    "tooltipexplorer/download",
+    "tooltipexplorer/tooltip",
+    "tooltipexplorer/hoverinfo"
+  )
+  for (ns in namespaces) {
+    logger::log_threshold(level, namespace = ns)
+  }
+  invisible(level)
+}
+```
+
+### Common threshold recipes
+
+``` r
+# Default (production) — INFO and above only
+tooltipexplorer::app_set_log_threshold(logger::INFO)
+
+# Development — everything including DEBUG
+tooltipexplorer::app_set_log_threshold(logger::DEBUG)
+
+# Silent except for warnings and errors
+tooltipexplorer::app_set_log_threshold(logger::WARN)
+```
+
+You can call
+[`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md)
+interactively at any time while the app is running — the threshold
+change takes effect immediately for all subsequent log calls.
+
+------------------------------------------------------------------------
+
+## Per-namespace overrides
+
+After calling
+[`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md)
+you can override individual namespaces with
+[`logger::log_threshold()`](https://daroczig.github.io/logger/reference/log_threshold.html)
+directly:
+
+``` r
+# Make the outputs module verbose while keeping everything else at INFO
+tooltipexplorer::app_set_log_threshold(logger::INFO)
+logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")
+
+# Silence the download module entirely
+logger::log_threshold(logger::FATAL, namespace = "tooltipexplorer/download")
+```
+
+### Reading back the current threshold
+
+``` r
+# Returns the current level for a given namespace
+logger::log_threshold(namespace = "tooltipexplorer/outputs")
+```
+
+------------------------------------------------------------------------
+
+## `with_logging()`
+
+[`with_logging()`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md)
+is a `tryCatch` / `withCallingHandlers` wrapper used around expressions
+that might produce warnings or errors. It logs both, adds a `context`
+label to every message, and then re-issues the condition so Shiny and
+the caller continue to see it normally.
+
+``` r
+with_logging <- function(expr, context = "", ns = "tooltipexplorer/app") {
+  tryCatch(
+    withCallingHandlers(
+      expr,
+      warning = function(w) {
+        logger::log_warn(
+          "[{context}] Warning: {conditionMessage(w)}",
+          namespace = ns
+        )
+        invokeRestart("muffleWarning")
+      }
+    ),
+    error = function(e) {
+      logger::log_error(
+        "[{context}] Error: {conditionMessage(e)}",
+        namespace = ns
+      )
+      stop(e)
+    }
+  )
+}
+```
+
+[`with_logging()`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md)
+is used in three places in
+[`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md):
+
+``` r
+# Wiring the inputs module
+inputs_r <- with_logging(
+  mod_inputs_server("inputs"),
+  context = "app_server / mod_inputs_server",
+  ns      = "tooltipexplorer/app"
+)
+
+# Wiring the outputs module
+perf_r <- with_logging(
+  mod_outputs_server("outputs", inputs_r = inputs_r),
+  context = "app_server / mod_outputs_server",
+  ns      = "tooltipexplorer/app"
+)
+
+# Wiring the download module
+with_logging(
+  mod_download_server("download", inputs_r = inputs_r, perf_r = perf_r),
+  context = "app_server / mod_download_server",
+  ns      = "tooltipexplorer/app"
+)
+```
+
+And inside module server functions themselves, wrapping individual
+output renderers:
+
+``` r
+output$bslib_boxes <- shiny::renderUI({
+  shiny::req(perf_r())
+  with_logging(
+    context = "mod_outputs / bslib_boxes",
+    ns      = "tooltipexplorer/outputs",
+    {
+      df <- perf_r()
+      logger::log_debug(
+        "Rendering bslib popover boxes | n: {nrow(df)}",
+        namespace = "tooltipexplorer/outputs"
+      )
+      # ... render code ...
+    }
+  )
+})
+```
+
+------------------------------------------------------------------------
+
+## Log-level patterns by module
+
+### `app_ui()` and `app_server()` — namespace `"tooltipexplorer/app"`
+
+| Event                                                                                                             | Level            |
+|-------------------------------------------------------------------------------------------------------------------|------------------|
+| `"Building app UI"`                                                                                               | `INFO`           |
+| `"Session started | session_id: ..."`                                                                             | `INFO`           |
+| `"mod_inputs_server() ready"`                                                                                     | `INFO`           |
+| `"mod_outputs_server() ready"`                                                                                    | `INFO`           |
+| `"mod_download_server() ready"`                                                                                   | `INFO`           |
+| `"Session ended | session_id: ..."`                                                                               | `INFO`           |
+| Any warning/error from [`with_logging()`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md) | `WARN` / `ERROR` |
+
+### `mod_inputs_server()` — namespace `"tooltipexplorer/inputs"`
+
+| Event                                                                             | Level   |
+|-----------------------------------------------------------------------------------|---------|
+| `"mod_inputs_server() initialised | id: ..."`                                     | `DEBUG` |
+| `"Fetch button pressed | tickers: [...] | from: ... | to: ... | vol_window: ..."` | `INFO`  |
+| `"Fetch pressed with no tickers selected"`                                        | `WARN`  |
+| `"Inputs reactive evaluated | tickers: [...]"`                                    | `DEBUG` |
+
+### `mod_outputs_server()` — namespace `"tooltipexplorer/outputs"`
+
+| Event                                                      | Level   |
+|------------------------------------------------------------|---------|
+| `"mod_outputs_server() initialised | id: ..."`             | `DEBUG` |
+| `"Fetching prices | tickers: [...] | from: ... | to: ..."` | `INFO`  |
+| `"Price fetch failed | tickers: [...] | error: ..."`       | `ERROR` |
+| `"Prices fetched | rows: ... | tickers: [...]"`            | `INFO`  |
+| `"Computing daily returns"`                                | `DEBUG` |
+| `"get_stock_returns() failed | error: ..."`                | `ERROR` |
+| `"Returns computed | rows: ..."`                           | `DEBUG` |
+| `"Computing performance summary"`                          | `DEBUG` |
+| `"summarise_performance() failed | error: ..."`            | `ERROR` |
+| `"Performance summary ready | symbols: [...]"`             | `INFO`  |
+| `"Rendering value boxes | n: ..."`                         | `DEBUG` |
+| `"Rendering bslib popover boxes | n: ..."`                 | `DEBUG` |
+| `"Rendering shinyhelper cards | n: ..."`                   | `DEBUG` |
+| `"Rendering prompter cards | n: ..."`                      | `DEBUG` |
+| `"Rendering shinyalert cards | n: ..."`                    | `DEBUG` |
+| `"Rendering reactable table | n: ..."`                     | `DEBUG` |
+
+### `mod_download_server()` — namespace `"tooltipexplorer/download"`
+
+| Event                                                     | Level   |
+|-----------------------------------------------------------|---------|
+| `"mod_download_server() initialised | id: ..."`           | `DEBUG` |
+| `"Download filename generated | file: ..."`               | `INFO`  |
+| `"Report render started | format: ... | tickers: [...]"`  | `INFO`  |
+| `"report_template.Rmd not found in package inst/"`        | `ERROR` |
+| `"Rendering to temp dir | path: ..."`                     | `DEBUG` |
+| `"rmarkdown::render() failed | format: ... | error: ..."` | `ERROR` |
+| `"Report render complete | format: ... | file: ..."`      | `INFO`  |
+
+### `mod_hoverinfo()` — namespace `"tooltipexplorer/hoverinfo"`
+
+| Event                                                    | Level   |
+|----------------------------------------------------------|---------|
+| `"mod_hoverinfo() | type: ... | contents length: ..."`   | `DEBUG` |
+| `"mod_hoverinfo() building reactable span | named: ..."` | `DEBUG` |
+| `"mod_hoverinfo() failed | type: ... | error: ..."`      | `ERROR` |
+
+------------------------------------------------------------------------
+
+## Log message format
+
+All messages use `logger`’s
+[`glue`](https://glue.tidyverse.org/)-interpolation syntax — curly-brace
+expressions are evaluated in the calling environment at the time the log
+call is made:
+
+``` r
+# Structured fields separated by " | "
+logger::log_info(
+  "Fetching prices | tickers: [{paste(tickers, collapse = ', ')}] | from: {from} | to: {to}",
+  namespace = "tooltipexplorer/outputs"
+)
+# → INFO [2026-04-03 08:00:00] Fetching prices | tickers: [AAPL, MSFT] | from: 2024-01-01 | to: 2024-12-31
+```
+
+The `key: value` pattern (pipe-separated) makes it easy to `grep` for a
+specific field across a log file:
+
+``` bash
+grep "tickers:" app.log
+grep "ERROR" app.log
+grep "tooltipexplorer/outputs" app.log
+```
+
+------------------------------------------------------------------------
+
+## Writing to a file
+
+By default `logger` writes to the console. To add a file appender
+alongside the console appender:
+
+``` r
+# Append all INFO+ messages to a rotating log file
+logger::log_appender(
+  logger::appender_tee(file = "tooltipexplorer.log"),
+  namespace = "tooltipexplorer/app"
+)
+```
+
+Or route a specific namespace to its own file:
+
+``` r
+logger::log_appender(
+  logger::appender_file("outputs.log"),
+  namespace = "tooltipexplorer/outputs"
+)
+```
+
+------------------------------------------------------------------------
+
+## Quick-reference: development setup
+
+``` r
+# 1. Load the package
+devtools::load_all()
+
+# 2. Make all namespaces verbose
+tooltipexplorer::app_set_log_threshold(logger::DEBUG)
+
+# 3. (Optional) focus on one noisy namespace only
+logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")
+
+# 4. Launch — log messages stream to the console as you interact
+tooltipexplorer::launch()
+```
+
+------------------------------------------------------------------------
+
+## References
+
+- [logger package documentation](https://daroczig.github.io/logger/)
+- [`?tooltipexplorer::app_set_log_threshold`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md)
+- [`?tooltipexplorer::with_logging`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md)
