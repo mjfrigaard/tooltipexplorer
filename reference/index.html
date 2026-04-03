@@ -18,8 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/logger-namespaces.html">Logging with logger: namespaces and thresholds</a></li>
-    <li><a class="dropdown-item" href="../articles/tooltips-hover-info.html">Tooltip and Hover-Info Explorer</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/tooltips-hover-info.html">Tooltip and Hover-Info Explorer</a></li>
+    <li><a class="dropdown-item" href="../articles/modules.html">Module structure</a></li>
+    <li><a class="dropdown-item" href="../articles/logger-namespaces.html">Logging with logger: namespaces and thresholds</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -35,9 +36,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="app">App<a class="anchor" aria-label="anchor" href="#app"></a></h2>
 
-
+      <div class="section-desc"><p>Entry points for creating and running the Shiny application.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -46,17 +47,10 @@
 
       <dl><dt>
 
-          <code><a href="app_server.html">app_server()</a></code>
+          <code><a href="launch.html">launch()</a></code>
 
         </dt>
-        <dd>Application server</dd>
-
-        <dt>
-
-          <code><a href="app_set_log_threshold.html">app_set_log_threshold()</a></code>
-
-        </dt>
-        <dd>Set the application-wide log threshold</dd>
+        <dd>Launch the Tooltip Explorer Shiny app</dd>
 
         <dt>
 
@@ -67,26 +61,95 @@
 
         <dt>
 
-          <code><a href="compute_rolling_vol.html">compute_rolling_vol()</a></code>
+          <code><a href="app_server.html">app_server()</a></code>
 
         </dt>
-        <dd>Compute rolling annualised volatility</dd>
+        <dd>Application server</dd>
+      </dl></div><div class="section level2">
+      <h2 id="modules">Modules<a class="anchor" aria-label="anchor" href="#modules"></a></h2>
+
+      <div class="section-desc"><p>Shiny modules following the <code>mod_&lt;name&gt;_ui()</code> / <code>mod_&lt;name&gt;_server()</code> convention. Each pair is co-located in a single <code>mod_&lt;name&gt;.R</code> file.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="mod_inputs_ui.html">mod_inputs_ui()</a></code>
+
+        </dt>
+        <dd>Inputs module UI</dd>
 
         <dt>
 
-          <code><a href="default_tickers.html">default_tickers</a></code>
+          <code><a href="mod_inputs_server.html">mod_inputs_server()</a></code>
 
         </dt>
-        <dd>Default stock tickers available in the app</dd>
+        <dd>Inputs module server</dd>
 
         <dt>
 
-          <code><a href="get_ff3_factors.html">get_ff3_factors()</a></code>
+          <code><a href="mod_outputs_ui.html">mod_outputs_ui()</a></code>
 
         </dt>
-        <dd>Retrieve Fama-French three-factor data via tidyfinance</dd>
+        <dd>Outputs module UI</dd>
 
         <dt>
+
+          <code><a href="mod_outputs_server.html">mod_outputs_server()</a></code>
+
+        </dt>
+        <dd>Outputs module server</dd>
+
+        <dt>
+
+          <code><a href="mod_download_ui.html">mod_download_ui()</a></code>
+
+        </dt>
+        <dd>Download module UI</dd>
+
+        <dt>
+
+          <code><a href="mod_download_server.html">mod_download_server()</a></code>
+
+        </dt>
+        <dd>Download module server</dd>
+      </dl></div><div class="section level2">
+      <h2 id="tooltip-helpers">Tooltip helpers<a class="anchor" aria-label="anchor" href="#tooltip-helpers"></a></h2>
+
+      <div class="section-desc"><p>UI and rendering helpers for attaching tooltip and hover content. <code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code> targets UI elements; <code><a href="../reference/mod_hoverinfo.html">mod_hoverinfo()</a></code> targets <code>reactable</code> table cells.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="mod_tooltip.html">mod_tooltip()</a></code>
+
+        </dt>
+        <dd>Tooltip module</dd>
+
+        <dt>
+
+          <code><a href="mod_hoverinfo.html">mod_hoverinfo()</a></code>
+
+        </dt>
+        <dd>Hover-info module</dd>
+      </dl></div><div class="section level2">
+      <h2 id="logic">Logic<a class="anchor" aria-label="anchor" href="#logic"></a></h2>
+
+      <div class="section-desc"><p>Financial data retrieval and transformation functions.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="get_stock_prices.html">get_stock_prices()</a></code>
 
@@ -102,73 +165,17 @@
 
         <dt>
 
-          <code><a href="grapes-or-or-grapes.html">`%||%`</a></code>
+          <code><a href="get_ff3_factors.html">get_ff3_factors()</a></code>
 
         </dt>
-        <dd>Null-coalescing operator</dd>
+        <dd>Retrieve Fama-French three-factor data via tidyfinance</dd>
 
         <dt>
 
-          <code><a href="launch.html">launch()</a></code>
+          <code><a href="compute_rolling_vol.html">compute_rolling_vol()</a></code>
 
         </dt>
-        <dd>Launch the Tooltip Explorer Shiny app</dd>
-
-        <dt>
-
-          <code><a href="mod_download_server.html">mod_download_server()</a></code>
-
-        </dt>
-        <dd>Download module server</dd>
-
-        <dt>
-
-          <code><a href="mod_download_ui.html">mod_download_ui()</a></code>
-
-        </dt>
-        <dd>Download module UI</dd>
-
-        <dt>
-
-          <code><a href="mod_hoverinfo.html">mod_hoverinfo()</a></code>
-
-        </dt>
-        <dd>Hover-info module</dd>
-
-        <dt>
-
-          <code><a href="mod_inputs_server.html">mod_inputs_server()</a></code>
-
-        </dt>
-        <dd>Inputs module server</dd>
-
-        <dt>
-
-          <code><a href="mod_inputs_ui.html">mod_inputs_ui()</a></code>
-
-        </dt>
-        <dd>Inputs module UI</dd>
-
-        <dt>
-
-          <code><a href="mod_outputs_server.html">mod_outputs_server()</a></code>
-
-        </dt>
-        <dd>Outputs module server</dd>
-
-        <dt>
-
-          <code><a href="mod_outputs_ui.html">mod_outputs_ui()</a></code>
-
-        </dt>
-        <dd>Outputs module UI</dd>
-
-        <dt>
-
-          <code><a href="mod_tooltip.html">mod_tooltip()</a></code>
-
-        </dt>
-        <dd>Tooltip module</dd>
+        <dd>Compute rolling annualised volatility</dd>
 
         <dt>
 
@@ -179,12 +186,43 @@
 
         <dt>
 
+          <code><a href="default_tickers.html">default_tickers</a></code>
+
+        </dt>
+        <dd>Default stock tickers available in the app</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
+
+      <div class="section-desc"><p>Logging helpers and operators.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="app_set_log_threshold.html">app_set_log_threshold()</a></code>
+
+        </dt>
+        <dd>Set the application-wide log threshold</dd>
+
+        <dt>
+
           <code><a href="with_logging.html">with_logging()</a></code>
 
         </dt>
         <dd>Execute an expression with structured error and warning logging</dd>
+
+        <dt>
+
+          <code><a href="grapes-or-or-grapes.html">`%||%`</a></code>
+
+        </dt>
+        <dd>Null-coalescing operator</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

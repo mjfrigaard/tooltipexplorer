@@ -33,8 +33,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/logger-namespaces.html">Logging with logger: namespaces and thresholds</a></li>
-    <li><a class="dropdown-item" href="../articles/tooltips-hover-info.html">Tooltip and Hover-Info Explorer</a></li>
+<li><a class="dropdown-item" href="../articles/tooltips-hover-info.html">Tooltip and Hover-Info Explorer</a></li>
+    <li><a class="dropdown-item" href="../articles/modules.html">Module structure</a></li>
+    <li><a class="dropdown-item" href="../articles/logger-namespaces.html">Logging with logger: namespaces and thresholds</a></li>
   </ul>
 </li>
       </ul>
@@ -604,7 +605,7 @@ appender alongside the console appender:</p>
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Load the package</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 2. Make all namespaces verbose</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span><span class="op">)</span></span>
