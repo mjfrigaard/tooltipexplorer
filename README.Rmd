@@ -34,7 +34,9 @@ pak::pak("mjfrigaard/tooltipexplorer")
 
 ```{r launch}
 library(tooltipexplorer)
+```
 
+```{r launch-app}
 # Launch the Shiny app
 launch()
 ```

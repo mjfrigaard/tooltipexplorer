@@ -1,22 +1,17 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
 
-
-
 # tooltipexplorer
 
-**tooltipexplorer** is a Shiny application-package for demoing and comparing
-five tooltip and hover-info approaches in R, powered by real financial data
-from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and
+**tooltipexplorer** is a Shiny application-package for demoing and
+comparing five tooltip and hover-info approaches in R, powered by real
+financial data from [Tidy Finance](https://www.tidy-finance.org/r/)
+(`tidyfinance`) and
 [tidyquant](https://business-science.github.io/tidyquant/).
 
 ## Installation
 
 Install the development version from GitHub:
-
 
 ``` r
 # install.packages("pak")
@@ -25,21 +20,23 @@ pak::pak("mjfrigaard/tooltipexplorer")
 
 ## Quick start
 
-
 ``` r
 library(tooltipexplorer)
+```
 
+``` r
 # Launch the Shiny app
 launch()
 ```
 
-Use the sidebar to select tickers and a date range, then click **Fetch data**.
-Each of the five tabs demonstrates a different tooltip or hover-info approach.
+Use the sidebar to select tickers and a date range, then click **Fetch
+data**. Each of the five tabs demonstrates a different tooltip or
+hover-info approach.
 
 ## Tooltip back-ends
 
 | Tab | Package | Interaction | Helper |
-|---|---|---|---|
+|----|----|----|----|
 | **bslib** | `bslib::popover()` | Click | `mod_tooltip(type = "bslib")` |
 | **shinyhelper** | `shinyhelper::helper()` | Click | `mod_tooltip(type = "shinyhelper")` |
 | **prompter** | `prompter::add_prompt()` | Hover | `mod_tooltip(type = "prompter")` |
@@ -48,9 +45,8 @@ Each of the five tabs demonstrates a different tooltip or hover-info approach.
 
 ## Data utilities
 
-The package exports a small set of financial data helpers you can use outside
-Shiny:
-
+The package exports a small set of financial data helpers you can use
+outside Shiny:
 
 ``` r
 prices  <- get_stock_prices(c("AAPL", "MSFT"), from = "2024-01-01")
@@ -64,8 +60,8 @@ ff3 <- get_ff3_factors("2020-01-01", "2023-12-31")
 
 ## Tooltip helpers
 
-`mod_tooltip()` provides a single interface across all click/hover back-ends:
-
+`mod_tooltip()` provides a single interface across all click/hover
+back-ends:
 
 ``` r
 # bslib popover (click)
@@ -86,7 +82,6 @@ mod_tooltip(
 
 `mod_hoverinfo()` formats hover content for `reactable` table cells:
 
-
 ``` r
 reactable::colDef(
   name = "Ann. Return (%)",
@@ -104,8 +99,8 @@ reactable::colDef(
 
 ## Logging
 
-All modules use the `logger` package.  Set the threshold once at session start:
-
+All modules use the `logger` package. Set the threshold once at session
+start:
 
 ``` r
 app_set_log_threshold(logger::DEBUG)  # verbose (development)
@@ -114,5 +109,6 @@ app_set_log_threshold(logger::WARN)   # quiet   (production)
 
 ## Learn more
 
-See `vignette("tooltips-hover-info", package = "tooltipexplorer")` for a full
-walkthrough of the app architecture, module API, and each tooltip back-end.
+See `vignette("tooltips-hover-info", package = "tooltipexplorer")` for a
+full walkthrough of the app architecture, module API, and each tooltip
+back-end.
