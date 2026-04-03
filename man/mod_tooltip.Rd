@@ -71,6 +71,16 @@ A lightweight UI helper that wraps several tooltip/popover/modal back-ends
 behind a single, consistent interface.  Drop it anywhere inside a UI or
 another module — no paired server function is required.
 }
+\section{App UI}{
+
+\code{mod_tooltip()} with \verb{type = "shinyalert"`` requires a delegated }jQuery\verb{ click handler injected into the page. I.e., in}app_ui.R`:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{shiny::tags$script(shiny::HTML("
+  $(document).on('click', '[data-sa-title]', function() \{ ... \});
+"))
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 \dontrun{
 # bslib popover (click to open)
