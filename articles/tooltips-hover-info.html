@@ -114,6 +114,11 @@ exported objects have one file each.</p>
 <h3 id="entry-points">Entry points<a class="anchor" aria-label="anchor" href="#entry-points"></a>
 </h3>
 <table class="table">
+<colgroup>
+<col width="21%">
+<col width="21%">
+<col width="56%">
+</colgroup>
 <thead><tr class="header">
 <th>File</th>
 <th>Function</th>
@@ -395,17 +400,23 @@ it anywhere inside a UI tree, including inside
 <div class="section level4">
 <h4 id="shinyhelper-example">shinyhelper example<a class="anchor" aria-label="anchor" href="#shinyhelper-example"></a>
 </h4>
+<ul>
+<li>
 <p><code>shinyhelper</code>’s own
 <code>.on('click', '.shinyhelper-icon')</code> binding runs once at page
 load, so it misses icons injected later by <code>renderUI</code>.</p>
-<p>This document-level delegated handler catches every click regardless
+<ul>
+<li>This document-level delegated handler catches every click regardless
 of when the icon was inserted, stops the (now-duplicate) built-in
 handler via <code>stopImmediatePropagation()</code>, then sets the same
-input that shinyhelper’s <code>observe_helpers()</code>
-<code>observeEvent</code> listens on.</p>
-<p><code>{priority: 'event'}</code> ensures re-firing when the same
+input that <code>shinyhelper</code>’s <code>observe_helpers()</code>
+<code><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html" class="external-link">shiny::observeEvent()</a></code> listens on.</li>
+</ul>
+</li>
+<li><p><code>{priority: 'event'}</code> ensures re-firing when the same
 ticker is clicked twice in a row (identical value would otherwise be
-dropped).</p>
+dropped).</p></li>
+</ul>
 <p><strong><em>In <code>app_ui.R</code>:</em></strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">script</span><span class="op">(</span><span class="fu">htmltools</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/htmltools/reference/HTML.html" class="external-link">HTML</a></span><span class="op">(</span></span>
@@ -561,6 +572,11 @@ namespaces</td>
 <h2 id="decision-guide">Decision guide<a class="anchor" aria-label="anchor" href="#decision-guide"></a>
 </h2>
 <table class="table">
+<colgroup>
+<col width="47%">
+<col width="27%">
+<col width="24%">
+</colgroup>
 <thead><tr class="header">
 <th>Where does the tooltip appear?</th>
 <th>Use</th>

@@ -220,16 +220,18 @@ mod_tooltip(
 
 #### shinyhelper example
 
-`shinyhelper`’s own `.on('click', '.shinyhelper-icon')` binding runs
-once at page load, so it misses icons injected later by `renderUI`.
+- `shinyhelper`’s own `.on('click', '.shinyhelper-icon')` binding runs
+  once at page load, so it misses icons injected later by `renderUI`.
 
-This document-level delegated handler catches every click regardless of
-when the icon was inserted, stops the (now-duplicate) built-in handler
-via `stopImmediatePropagation()`, then sets the same input that
-shinyhelper’s `observe_helpers()` `observeEvent` listens on.
+  - This document-level delegated handler catches every click regardless
+    of when the icon was inserted, stops the (now-duplicate) built-in
+    handler via `stopImmediatePropagation()`, then sets the same input
+    that `shinyhelper`’s `observe_helpers()`
+    [`shiny::observeEvent()`](https://rdrr.io/pkg/shiny/man/observeEvent.html)
+    listens on.
 
-`{priority: 'event'}` ensures re-firing when the same ticker is clicked
-twice in a row (identical value would otherwise be dropped).
+- `{priority: 'event'}` ensures re-firing when the same ticker is
+  clicked twice in a row (identical value would otherwise be dropped).
 
 ***In `app_ui.R`:***
 
