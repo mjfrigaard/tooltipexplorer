@@ -47,16 +47,7 @@ app_ui <- function() {
           "});"
         )),
 
-        # Delegated shinyhelper handler.
-        #
-        # shinyhelper's own .on('click', '.shinyhelper-icon') binding runs
-        # once at page load, so it misses icons injected later by renderUI.
-        # This document-level delegated handler catches every click regardless
-        # of when the icon was inserted, stops the (now-duplicate) built-in
-        # handler via stopImmediatePropagation(), then sets the same input
-        # that shinyhelper's observe_helpers() observeEvent listens on.
-        # {priority: 'event'} ensures re-firing when the same ticker is
-        # clicked twice in a row (identical value would otherwise be dropped).
+        # delegated shinyhelper handler ----
         shiny::tags$script(htmltools::HTML(
           "$(document).on('click', '.shinyhelper-icon', function(e) {",
           "  e.stopImmediatePropagation();",

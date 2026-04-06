@@ -6,7 +6,9 @@
 #' 
 #' @section `shinyalert` usage in UI: 
 #' `type = "shinyalert"` requires a delegated `jQuery` click handler injected
-#' into the page. I.e., in `app_ui.R`:
+#' into the page. See vignette for more information: 
+#' 
+#' I.e., in `app_ui.R`:
 #' 
 #' ```r
 #' shiny::tags$script(shiny::HTML("

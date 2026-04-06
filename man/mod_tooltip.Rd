@@ -74,7 +74,9 @@ another module — no paired server function is required.
 \section{\code{shinyalert} usage in UI}{
 
 \code{type = "shinyalert"} requires a delegated \code{jQuery} click handler injected
-into the page. I.e., in \code{app_ui.R}:
+into the page. See vignette for more information:
+
+I.e., in \code{app_ui.R}:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{shiny::tags$script(shiny::HTML("
   $(document).on('click', '[data-sa-title]', function() \{ ... \});
