@@ -15,19 +15,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-**tooltipexplorer** is a Shiny application-package for demoing and comparing
-tooltip and hover-info approaches in R using real financial data from
-[Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and
-[tidyquant](https://business-science.github.io/tidyquant/).
+**tooltipexplorer** is a Shiny application-package for demoing and comparing tooltip and hover-info approaches in R using real financial data from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and [tidyquant](https://business-science.github.io/tidyquant/).
 
----
+------------------------------------------------------------------------
 
 ## Package structure
 
-Each module lives in a single file containing both its `_ui()` and `_server()`
-functions.  All other exported objects have one file each.
+Each module lives in a single file containing both its `_ui()` and `_server()` functions. All other exported objects have one file each.
 
-```
+```         
 R/
 ├── app_server.R              # app_server()
 ├── app_set_log_threshold.R   # app_set_log_threshold()
@@ -48,7 +44,7 @@ R/
 └── with_logging.R            # with_logging()
 ```
 
----
+------------------------------------------------------------------------
 
 ## Launching the app
 
@@ -56,24 +52,23 @@ R/
 tooltipexplorer::launch()
 ```
 
-`launch()` calls `shiny::shinyApp(app_ui(), app_server)` and accepts `...`
-forwarded to `shiny::shinyApp()` (e.g. `options = list(port = 4000)`).
+`launch()` calls `shiny::shinyApp(app_ui(), app_server)` and accepts `...` forwarded to `shiny::shinyApp()` (e.g. `options = list(port = 4000)`).
 
----
+------------------------------------------------------------------------
 
 ## App architecture
 
 ### Entry points
 
-| File | Function | Role |
-|---|---|---|
-| `launch.R` | `launch()` | Creates and runs the Shiny app |
-| `app_ui.R` | `app_ui()` | Top-level `bslib::page_sidebar()` layout |
-| `app_server.R` | `app_server()` | Wires all module servers together |
+| File           | Function       | Role                                     |
+|----------------|----------------|------------------------------------------|
+| `launch.R`     | `launch()`     | Creates and runs the Shiny app           |
+| `app_ui.R`     | `app_ui()`     | Top-level `bslib::page_sidebar()` layout |
+| `app_server.R` | `app_server()` | Wires all module servers together        |
 
 ### Reactive flow
 
-```
+```         
 launch()
   └─ shinyApp(app_ui(), app_server)
 
@@ -89,16 +84,13 @@ app_server()
   └─ mod_download_server("download", inputs_r, perf_r)
 ```
 
-The download module UI (`mod_download_ui("download")`) is embedded at the
-bottom of the inputs sidebar inside `mod_inputs_ui()`; its server is wired
-at the top level in `app_server()`.
+The download module UI (`mod_download_ui("download")`) is embedded at the bottom of the inputs sidebar inside `mod_inputs_ui()`; its server is wired at the top level in `app_server()`.
 
----
+------------------------------------------------------------------------
 
 ## Modules
 
-All modules follow the `mod_<name>_ui()` / `mod_<name>_server()` convention
-and are co-located in a single `mod_<name>.R` file.
+All modules follow the `mod_<name>_ui()` / `mod_<name>_server()` convention and are co-located in a single `mod_<name>.R` file.
 
 ### Inputs — `mod_inputs.R`
 
@@ -131,30 +123,27 @@ list(
 
 **`mod_outputs_server(id, inputs_r)`** — triggered by `inputs_r()$fetch`:
 
-1. Calls `shinyhelper::observe_helpers()` once per session (registered here)
-2. Calls `get_stock_prices()` → `prices_r`
-3. Calls `get_stock_returns(prices_r())` → `returns_r`
-4. Calls `summarise_performance(returns_r())` → `perf_r`
-5. Renders all outputs (value boxes + five tabs)
-6. **Returns** `perf_r` for the download module
+1.  Calls `shinyhelper::observe_helpers()` once per session (registered here)
+2.  Calls `get_stock_prices()` → `prices_r`
+3.  Calls `get_stock_returns(prices_r())` → `returns_r`
+4.  Calls `summarise_performance(returns_r())` → `perf_r`
+5.  Renders all outputs (value boxes + five tabs)
+6.  **Returns** `perf_r` for the download module
 
 ### Download — `mod_download.R`
 
-**`mod_download_ui(id)`** — a `bslib::card()` with a format selector and
-`downloadButton`.
+**`mod_download_ui(id)`** — a `bslib::card()` with a format selector and `downloadButton`.
 
-**`mod_download_server(id, inputs_r, perf_r)`** — renders a parameterised
-`inst/report_template.Rmd` into HTML or PDF and serves it via
-`shiny::downloadHandler()`.
+**`mod_download_server(id, inputs_r, perf_r)`** — renders a parameterised `inst/report_template.Rmd` into HTML or PDF and serves it via `shiny::downloadHandler()`.
 
----
+------------------------------------------------------------------------
 
 ## Data utilities
 
 Financial data is fetched and processed through four functions:
 
 | File | Function | Description |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `get_stock_prices.R` | `get_stock_prices(tickers, from, to)` | Daily adjusted prices via `tidyquant::tq_get()` |
 | `get_stock_returns.R` | `get_stock_returns(prices)` | Daily log returns: `log(adjusted / lag(adjusted))` |
 | `compute_rolling_vol.R` | `compute_rolling_vol(returns, window)` | Rolling annualised volatility via `slider::slide_dbl()` |
@@ -173,18 +162,15 @@ perf    <- summarise_performance(returns)
 vol     <- compute_rolling_vol(returns, window = 30L)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Tooltip helpers
 
-Two helper functions provide a uniform interface for attaching tooltip and
-hover content across all five back-ends.
+Two helper functions provide a uniform interface for attaching tooltip and hover content across all five back-ends.
 
 ### `mod_tooltip()`
 
-A **UI helper** (in `mod_tooltip.R`) — returns a `shiny.tag` with no
-server-side counterpart.  Place it anywhere inside a UI tree, including
-inside `renderUI()`.
+A **UI helper** (in `mod_tooltip.R`) — returns a `shiny.tag` with no server-side counterpart. Place it anywhere inside a UI tree, including inside `renderUI()`.
 
 ```{r}
 mod_tooltip(
@@ -201,7 +187,7 @@ mod_tooltip(
 ```
 
 | `type` | Back-end | Interaction | Extra `...` args |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | `"bslib"` | `bslib::popover()` | Click | `title`, `placement` |
 | `"shinyhelper"` | `shinyhelper::helper()` | Click | `title`, `colour`, `icon`, `buttonLabel`, `easyClose`, `fade` |
 | `"prompter"` | `prompter::add_prompt()` | Hover | `position`, `rounded`, `bounce`, `arrow`, `animate` |
@@ -219,18 +205,14 @@ mod_tooltip(
 
 #### shinyhelper example
 
-`shinyhelper`'s own `.on('click', '.shinyhelper-icon')` binding runs 
-once at page load, so it misses icons injected later by `renderUI`. 
+- `shinyhelper`'s own `.on('click', '.shinyhelper-icon')` binding runs once at page load, so it misses icons injected later by `renderUI`.
 
-This document-level delegated handler catches every click regardless
-of when the icon was inserted, stops the (now-duplicate) built-in
-handler via `stopImmediatePropagation()`, then sets the same input
-that shinyhelper's `observe_helpers()` `observeEvent` listens on.
+  - This document-level delegated handler catches every click regardless of when the icon was inserted, stops the (now-duplicate) built-in handler via `stopImmediatePropagation()`, then sets the same input that `shinyhelper`'s `observe_helpers()` `shiny::observeEvent()` listens on.
 
-`{priority: 'event'}` ensures re-firing when the same ticker is
-clicked twice in a row (identical value would otherwise be dropped).
+- `{priority: 'event'}` ensures re-firing when the same ticker is clicked twice in a row (identical value would otherwise be dropped).
 
 ***In `app_ui.R`:***
+
 ```{r}
 shiny::tags$script(htmltools::HTML(
   "$(document).on('click', '.shinyhelper-icon', function(e) {",
@@ -273,8 +255,7 @@ mod_tooltip(
 
 #### shinyalert example
 
-The `shinyalert` back-end stores content in `data-sa-*` attributes and fires
-on click via a delegated `jQuery` handler injected once in `app_ui()`. 
+The `shinyalert` back-end stores content in `data-sa-*` attributes and fires on click via a delegated `jQuery` handler injected once in `app_ui()`.
 
 ***In `app_ui.R`:***
 
@@ -293,7 +274,8 @@ shiny::tags$script(htmltools::HTML(
 )),
 ```
 
- No `observeEvent()` or server handler is needed:
+No `observeEvent()` or server handler is needed:
+
 ```{r}
 mod_tooltip(
   trigger           = shiny::tags$span(class = "fs-4 fw-bold", "AAPL"),
@@ -305,12 +287,11 @@ mod_tooltip(
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ### `mod_hoverinfo()`
 
-A **rendering helper** (in `mod_hoverinfo.R`) — formats hover content for
-back-ends that build tooltips programmatically inside table-cell renderers.
+A **rendering helper** (in `mod_hoverinfo.R`) — formats hover content for back-ends that build tooltips programmatically inside table-cell renderers.
 
 ```{r}
 mod_hoverinfo(
@@ -323,9 +304,7 @@ mod_hoverinfo(
 )
 ```
 
-Returns an `htmltools` `<span>` with a `title` attribute — browsers render
-this as a native tooltip on hover.  Use inside
-`reactable::colDef(cell = ..., html = TRUE)`.
+Returns an `htmltools` `<span>` with a `title` attribute — browsers render this as a native tooltip on hover. Use inside `reactable::colDef(cell = ..., html = TRUE)`.
 
 ```{r}
 reactable::colDef(
@@ -345,32 +324,31 @@ reactable::colDef(
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ## Logging utilities
 
 | File | Function | Description |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `app_set_log_threshold.R` | `app_set_log_threshold(level)` | Sets `logger` threshold across all package namespaces |
 | `with_logging.R` | `with_logging(expr, context, ns)` | `tryCatch` wrapper that logs warnings and errors |
 | `utils_operators.R` | `%||%` | Null-coalescing operator |
 
-`app_set_log_threshold()` is called once in `app_server()` at session start.
-Pass `logger::DEBUG` during development for verbose output:
+`app_set_log_threshold()` is called once in `app_server()` at session start. Pass `logger::DEBUG` during development for verbose output:
 
 ```{r}
 # In app_server(), or interactively:
 app_set_log_threshold(logger::DEBUG)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Decision guide
 
-| Where does the tooltip appear? | Use | `type` |
-|---|---|---|
-| Input label / icon in sidebar | `mod_tooltip()` | `"bslib"` |
-| Metric card with help modal | `mod_tooltip()` | `"shinyhelper"` |
-| Metric label — CSS hover | `mod_tooltip()` | `"prompter"` |
-| Clickable element → modal alert | `mod_tooltip()` | `"shinyalert"` |
-| reactable table cell | `mod_hoverinfo()` | `"reactable"` |
+| Where does the tooltip appear?  | Use               | `type`          |
+|---------------------------------|-------------------|-----------------|
+| Input label / icon in sidebar   | `mod_tooltip()`   | `"bslib"`       |
+| Metric card with help modal     | `mod_tooltip()`   | `"shinyhelper"` |
+| Metric label — CSS hover        | `mod_tooltip()`   | `"prompter"`    |
+| Clickable element → modal alert | `mod_tooltip()`   | `"shinyalert"`  |
+| reactable table cell            | `mod_hoverinfo()` | `"reactable"`   |
