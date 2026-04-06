@@ -245,9 +245,18 @@ mod_tooltip(
 #### shinyalert example
 
 The `shinyalert` back-end stores content in `data-sa-*` attributes and
-fires on click via a delegated jQuery handler injected once in
+fires on click via a delegated `jQuery` handler injected once in
 [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md).
-No `observeEvent()` or server handler is needed.
+
+***EXAMPLE: i.e., in `app_ui.R`:***
+
+``` r
+shiny::tags$script(shiny::HTML("
+   $(document).on('click', '[data-sa-title]', function() { ... });
+"))
+```
+
+No `observeEvent()` or server handler is needed:
 
 ``` r
 mod_tooltip(

@@ -100,8 +100,8 @@ A `shiny.tag` (or `shiny.tagList`) ready to embed in any UI.
 
 ## `shinyalert` usage in UI
 
-To use `mod_tooltip()` with `type = "shinyalert"` requires a delegated
-`jQuery` click handler injected into the page. I.e., in `app_ui.R`:
+`type = "shinyalert"` requires a delegated `jQuery` click handler
+injected into the page. I.e., in `app_ui.R`:
 
     shiny::tags$script(shiny::HTML("
       $(document).on('click', '[data-sa-title]', function() { ... });

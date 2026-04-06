@@ -421,9 +421,15 @@ it anywhere inside a UI tree, including inside
 </h4>
 <p>The <code>shinyalert</code> back-end stores content in
 <code>data-sa-*</code> attributes and fires on click via a delegated
-jQuery handler injected once in <code><a href="../reference/app_ui.html">app_ui()</a></code>. No
-<code>observeEvent()</code> or server handler is needed.</p>
+<code>jQuery</code> handler injected once in <code><a href="../reference/app_ui.html">app_ui()</a></code>.</p>
+<p><strong><em>EXAMPLE: i.e., in
+<code>app_ui.R</code>:</em></strong></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">script</span><span class="op">(</span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/htmltools/reference/HTML.html" class="external-link">HTML</a></span><span class="op">(</span><span class="st">"</span></span>
+<span><span class="st">   $(document).on('click', '[data-sa-title]', function() { ... });</span></span>
+<span><span class="st">"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>No <code>observeEvent()</code> or server handler is needed:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger           <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">span</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"fs-4 fw-bold"</span>, <span class="st">"AAPL"</span><span class="op">)</span>,</span>
 <span>  type              <span class="op">=</span> <span class="st">"shinyalert"</span>,</span>
@@ -442,7 +448,7 @@ jQuery handler injected once in <code><a href="../reference/app_ui.html">app_ui(
 <p>A <strong>rendering helper</strong> (in <code>mod_hoverinfo.R</code>)
 — formats hover content for back-ends that build tooltips
 programmatically inside table-cell renderers.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_hoverinfo.html">mod_hoverinfo</a></span><span class="op">(</span></span>
 <span>  type     <span class="op">=</span> <span class="st">"reactable"</span>,   <span class="co"># currently the only supported back-end</span></span>
 <span>  contents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,  <span class="co"># tooltip text; named vector → "Name: value" pairs</span></span>
@@ -455,7 +461,7 @@ programmatically inside table-cell renderers.</p>
 <code>title</code> attribute — browsers render this as a native tooltip
 on hover. Use inside
 <code>reactable::colDef(cell = ..., html = TRUE)</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reactable</span><span class="fu">::</span><span class="fu"><a href="https://glin.github.io/reactable/reference/colDef.html" class="external-link">colDef</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Ann. Return (%)"</span>,</span>
 <span>  html <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -511,7 +517,7 @@ namespaces</td>
 <p><code><a href="../reference/app_set_log_threshold.html">app_set_log_threshold()</a></code> is called once in
 <code><a href="../reference/app_server.html">app_server()</a></code> at session start. Pass
 <code><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">logger::DEBUG</a></code> during development for verbose output:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># In app_server(), or interactively:</span></span>
 <span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span><span class="op">)</span></span></code></pre></div>
 <hr>
