@@ -220,6 +220,37 @@ mod_tooltip(
 
 #### shinyhelper example
 
+`shinyhelper`’s own `.on('click', '.shinyhelper-icon')` binding runs
+once at page load, so it misses icons injected later by `renderUI`.
+
+This document-level delegated handler catches every click regardless of
+when the icon was inserted, stops the (now-duplicate) built-in handler
+via `stopImmediatePropagation()`, then sets the same input that
+shinyhelper’s `observe_helpers()` `observeEvent` listens on.
+
+`{priority: 'event'}` ensures re-firing when the same ticker is clicked
+twice in a row (identical value would otherwise be dropped).
+
+***In `app_ui.R`:***
+
+``` r
+shiny::tags$script(htmltools::HTML(
+  "$(document).on('click', '.shinyhelper-icon', function(e) {",
+  "  e.stopImmediatePropagation();",
+  "  var d = $(this).data();",
+  "  Shiny.setInputValue('shinyhelper_params', {",
+  "    size:      d.modalSize,",
+  "    type:      d.modalType,",
+  "    title:     d.modalTitle,",
+  "    content:   d.modalContent,",
+  "    label:     d.modalLabel,",
+  "    easyClose: d.modalEasyclose,",
+  "    fade:      d.modalFade",
+  "  }, {priority: 'event'});",
+  "});"
+))
+```
+
 ``` r
 mod_tooltip(
   trigger     = shiny::tags$span("Sharpe Ratio"),
@@ -248,12 +279,21 @@ The `shinyalert` back-end stores content in `data-sa-*` attributes and
 fires on click via a delegated `jQuery` handler injected once in
 [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md).
 
-***EXAMPLE: i.e., in `app_ui.R`:***
+***In `app_ui.R`:***
 
 ``` r
-shiny::tags$script(shiny::HTML("
-   $(document).on('click', '[data-sa-title]', function() { ... });
-"))
+shiny::tags$script(htmltools::HTML(
+  "$(document).on('click', '.sa-trigger', function () {",
+  "  var d = $(this).data();",
+  "  swal({",
+  "    title:             d.saTitle || '',",
+  "    text:              d.saText  || '',",
+  "    type:              d.saType  || 'info',",
+  "    html:              true,",
+  "    confirmButtonText: d.saBtn   || 'OK'",
+  "  });",
+  "});"
+)),
 ```
 
 No `observeEvent()` or server handler is needed:

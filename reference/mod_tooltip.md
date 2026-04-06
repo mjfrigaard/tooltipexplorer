@@ -101,7 +101,9 @@ A `shiny.tag` (or `shiny.tagList`) ready to embed in any UI.
 ## `shinyalert` usage in UI
 
 `type = "shinyalert"` requires a delegated `jQuery` click handler
-injected into the page. I.e., in `app_ui.R`:
+injected into the page. See vignette for more information:
+
+I.e., in `app_ui.R`:
 
     shiny::tags$script(shiny::HTML("
       $(document).on('click', '[data-sa-title]', function() { ... });

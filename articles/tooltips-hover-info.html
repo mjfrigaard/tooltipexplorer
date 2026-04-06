@@ -395,7 +395,35 @@ it anywhere inside a UI tree, including inside
 <div class="section level4">
 <h4 id="shinyhelper-example">shinyhelper example<a class="anchor" aria-label="anchor" href="#shinyhelper-example"></a>
 </h4>
+<p><code>shinyhelper</code>’s own
+<code>.on('click', '.shinyhelper-icon')</code> binding runs once at page
+load, so it misses icons injected later by <code>renderUI</code>.</p>
+<p>This document-level delegated handler catches every click regardless
+of when the icon was inserted, stops the (now-duplicate) built-in
+handler via <code>stopImmediatePropagation()</code>, then sets the same
+input that shinyhelper’s <code>observe_helpers()</code>
+<code>observeEvent</code> listens on.</p>
+<p><code>{priority: 'event'}</code> ensures re-firing when the same
+ticker is clicked twice in a row (identical value would otherwise be
+dropped).</p>
+<p><strong><em>In <code>app_ui.R</code>:</em></strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">script</span><span class="op">(</span><span class="fu">htmltools</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/htmltools/reference/HTML.html" class="external-link">HTML</a></span><span class="op">(</span></span>
+<span>  <span class="st">"$(document).on('click', '.shinyhelper-icon', function(e) {"</span>,</span>
+<span>  <span class="st">"  e.stopImmediatePropagation();"</span>,</span>
+<span>  <span class="st">"  var d = $(this).data();"</span>,</span>
+<span>  <span class="st">"  Shiny.setInputValue('shinyhelper_params', {"</span>,</span>
+<span>  <span class="st">"    size:      d.modalSize,"</span>,</span>
+<span>  <span class="st">"    type:      d.modalType,"</span>,</span>
+<span>  <span class="st">"    title:     d.modalTitle,"</span>,</span>
+<span>  <span class="st">"    content:   d.modalContent,"</span>,</span>
+<span>  <span class="st">"    label:     d.modalLabel,"</span>,</span>
+<span>  <span class="st">"    easyClose: d.modalEasyclose,"</span>,</span>
+<span>  <span class="st">"    fade:      d.modalFade"</span>,</span>
+<span>  <span class="st">"  }, {priority: 'event'});"</span>,</span>
+<span>  <span class="st">"});"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger     <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">span</span><span class="op">(</span><span class="st">"Sharpe Ratio"</span><span class="op">)</span>,</span>
 <span>  type        <span class="op">=</span> <span class="st">"shinyhelper"</span>,</span>
@@ -408,7 +436,7 @@ it anywhere inside a UI tree, including inside
 <div class="section level4">
 <h4 id="prompter-example">prompter example<a class="anchor" aria-label="anchor" href="#prompter-example"></a>
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger  <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">span</span><span class="op">(</span><span class="st">"Ann. Vol"</span><span class="op">)</span>,</span>
 <span>  type     <span class="op">=</span> <span class="st">"prompter"</span>,</span>
@@ -422,14 +450,21 @@ it anywhere inside a UI tree, including inside
 <p>The <code>shinyalert</code> back-end stores content in
 <code>data-sa-*</code> attributes and fires on click via a delegated
 <code>jQuery</code> handler injected once in <code><a href="../reference/app_ui.html">app_ui()</a></code>.</p>
-<p><strong><em>EXAMPLE: i.e., in
-<code>app_ui.R</code>:</em></strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">script</span><span class="op">(</span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/htmltools/reference/HTML.html" class="external-link">HTML</a></span><span class="op">(</span><span class="st">"</span></span>
-<span><span class="st">   $(document).on('click', '[data-sa-title]', function() { ... });</span></span>
-<span><span class="st">"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><strong><em>In <code>app_ui.R</code>:</em></strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>shiny<span class="sc">::</span>tags<span class="sc">$</span><span class="fu">script</span>(htmltools<span class="sc">::</span><span class="fu">HTML</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="st">"$(document).on('click', '.sa-trigger', function () {"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="st">"  var d = $(this).data();"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="st">"  swal({"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="st">"    title:             d.saTitle || '',"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="st">"    text:              d.saText  || '',"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="st">"    type:              d.saType  || 'info',"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="st">"    html:              true,"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="st">"    confirmButtonText: d.saBtn   || 'OK'"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="st">"  });"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  <span class="st">"});"</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>)),</span></code></pre></div>
 <p>No <code>observeEvent()</code> or server handler is needed:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger           <span class="op">=</span> <span class="fu">shiny</span><span class="fu">::</span><span class="va"><a href="https://rstudio.github.io/htmltools/reference/builder.html" class="external-link">tags</a></span><span class="op">$</span><span class="fu">span</span><span class="op">(</span>class <span class="op">=</span> <span class="st">"fs-4 fw-bold"</span>, <span class="st">"AAPL"</span><span class="op">)</span>,</span>
 <span>  type              <span class="op">=</span> <span class="st">"shinyalert"</span>,</span>
@@ -448,7 +483,7 @@ it anywhere inside a UI tree, including inside
 <p>A <strong>rendering helper</strong> (in <code>mod_hoverinfo.R</code>)
 — formats hover content for back-ends that build tooltips
 programmatically inside table-cell renderers.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_hoverinfo.html">mod_hoverinfo</a></span><span class="op">(</span></span>
 <span>  type     <span class="op">=</span> <span class="st">"reactable"</span>,   <span class="co"># currently the only supported back-end</span></span>
 <span>  contents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,  <span class="co"># tooltip text; named vector → "Name: value" pairs</span></span>
@@ -461,7 +496,7 @@ programmatically inside table-cell renderers.</p>
 <code>title</code> attribute — browsers render this as a native tooltip
 on hover. Use inside
 <code>reactable::colDef(cell = ..., html = TRUE)</code>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reactable</span><span class="fu">::</span><span class="fu"><a href="https://glin.github.io/reactable/reference/colDef.html" class="external-link">colDef</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Ann. Return (%)"</span>,</span>
 <span>  html <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -517,7 +552,7 @@ namespaces</td>
 <p><code><a href="../reference/app_set_log_threshold.html">app_set_log_threshold()</a></code> is called once in
 <code><a href="../reference/app_server.html">app_server()</a></code> at session start. Pass
 <code><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">logger::DEBUG</a></code> during development for verbose output:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># In app_server(), or interactively:</span></span>
 <span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span><span class="op">)</span></span></code></pre></div>
 <hr>
