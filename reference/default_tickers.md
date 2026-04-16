@@ -1,6 +1,6 @@
 # Default stock tickers available in the app
 
-A character vector of mega-cap tickers used as app defaults.
+A character vector of pharma company tickers used as app defaults.
 
 ## Usage
 
