@@ -11,6 +11,6 @@ An object of class \code{character} of length 7.
 default_tickers
 }
 \description{
-A character vector of mega-cap tickers used as app defaults.
+A character vector of pharma company tickers used as app defaults.
 }
 \keyword{datasets}
