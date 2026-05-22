@@ -12,10 +12,10 @@ data flows between modules, and the role each module plays.
 
 Every module follows the same file-and-function layout:
 
-| File               | UI function           | Server function                             |
-|--------------------|-----------------------|---------------------------------------------|
-| `R/mod_inputs.R`   | `mod_inputs_ui(id)`   | `mod_inputs_server(id)`                     |
-| `R/mod_outputs.R`  | `mod_outputs_ui(id)`  | `mod_outputs_server(id, inputs_r)`          |
+| File | UI function | Server function |
+|----|----|----|
+| `R/mod_inputs.R` | `mod_inputs_ui(id)` | `mod_inputs_server(id)` |
+| `R/mod_outputs.R` | `mod_outputs_ui(id)` | `mod_outputs_server(id, inputs_r)` |
 | `R/mod_download.R` | `mod_download_ui(id)` | `mod_download_server(id, inputs_r, perf_r)` |
 
 The two tooltip helpers
@@ -40,6 +40,7 @@ rather than at the top level, so the sidebar contains all user controls
 in one place.
 
 ``` r
+
 app_ui <- function() {
   bslib::page_sidebar(
     sidebar = mod_inputs_ui("inputs"),   # sidebar: includes mod_download_ui()
@@ -54,6 +55,7 @@ reactive (`perf_r`) that the download server consumes — this is the only
 inter-module dependency.
 
 ``` r
+
 app_server <- function(input, output, session) {
   app_set_log_threshold(logger::INFO)
 
@@ -95,6 +97,7 @@ with `type = "bslib"` is used on the ticker and vol-window labels to
 attach `bslib` popovers without any server-side code:
 
 ``` r
+
 shiny::selectizeInput(
   inputId = ns("tickers"),
   label   = shiny::tags$span(
@@ -117,6 +120,7 @@ shiny::selectizeInput(
 one ticker is selected, then returns a **reactive list**:
 
 ``` r
+
 list(
   tickers    = character(),  # selected ticker symbols
   from       = Date,         # start of date range
@@ -152,13 +156,13 @@ with two pieces:
 2.  [`bslib::navset_card_tab()`](https://rstudio.github.io/bslib/reference/navset.html)
     — five demo tabs, one per tooltip back-end.
 
-| Tab           | Back-end                                                                                                                                                                  | Interaction       |
-|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| `bslib`       | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Click info icon   |
-| `shinyhelper` | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)   | Click circled-?   |
-| `prompter`    | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Hover over label  |
-| `shinyalert`  | `data-sa-*` attrs + delegated JS via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)                                             | Click ticker card |
-| reactable     | `htmltools` `<span title>` via [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md)                                               | Hover over cell   |
+| Tab | Back-end | Interaction |
+|----|----|----|
+| `bslib` | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Click info icon |
+| `shinyhelper` | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Click circled-? |
+| `prompter` | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Hover over label |
+| `shinyalert` | `data-sa-*` attrs + delegated JS via [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | Click ticker card |
+| reactable | `htmltools` `<span title>` via [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md) | Hover over cell |
 
 ### Server function
 
@@ -171,6 +175,7 @@ in
 then chains four reactives triggered by `inputs_r()$fetch`:
 
 ``` r
+
 # 1 — fetch adjusted prices
 prices_r <- shiny::eventReactive(inputs_r()$fetch, {
   get_stock_prices(
@@ -204,6 +209,7 @@ can embed it in the rendered report without re-computing it.
 The value boxes are colored by Sharpe ratio threshold:
 
 ``` r
+
 theme <- if (sharpe >= 1) "success" else if (sharpe >= 0) "warning" else "danger"
 ```
 
@@ -216,6 +222,7 @@ renderer that wraps the formatted value in an `htmltools`
 `<span title="...">`:
 
 ``` r
+
 reactable::colDef(
   name = "Ann. Return (%)",
   html = TRUE,
@@ -257,6 +264,7 @@ The `card` is embedded at the bottom of the inputs sidebar by
 [`mod_inputs_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_inputs_ui.md):
 
 ``` r
+
 # inside mod_inputs_ui()
 bslib::sidebar(
   # ... other inputs ...
@@ -279,6 +287,7 @@ and serves the output through
 Below are the parameters passed to the template:
 
 ``` r
+
 params = list(
   tickers    = inp$tickers,
   from       = as.character(inp$from),
@@ -305,6 +314,7 @@ A **UI helper** — returns a `shiny.tag` with no server counterpart.
 Place it anywhere inside a UI tree, including inside `renderUI()`.
 
 ``` r
+
 mod_tooltip(
   trigger     = bsicons::bs_icon("info-circle"),  # clickable/hoverable element
   type        = "bslib",      # "bslib" | "shinyhelper" | "prompter" | "shinyalert"
@@ -324,6 +334,7 @@ A **rendering helper** — returns an `htmltools` `<span title="...">` for
 use inside `reactable::colDef(cell = ..., html = TRUE)`.
 
 ``` r
+
 mod_hoverinfo(
   type     = "reactable",    # only supported back-end
   contents = character(0),   # tooltip text; named vector → "Name: value" pairs

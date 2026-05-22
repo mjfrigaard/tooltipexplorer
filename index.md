@@ -11,6 +11,7 @@ financial data from [Tidy Finance](https://www.tidy-finance.org/r/)
 Install the development version from GitHub:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("mjfrigaard/tooltipexplorer")
 ```
@@ -18,10 +19,12 @@ pak::pak("mjfrigaard/tooltipexplorer")
 ## Quick start
 
 ``` r
+
 library(tooltipexplorer)
 ```
 
 ``` r
+
 # Launch the Shiny app
 launch()
 ```
@@ -32,13 +35,13 @@ hover-info approach.
 
 ## Tooltip back-ends
 
-| Tab             | Package                                                                      | Interaction | Helper                              |
-|-----------------|------------------------------------------------------------------------------|-------------|-------------------------------------|
-| **bslib**       | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) | Click       | `mod_tooltip(type = "bslib")`       |
-| **shinyhelper** | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html)   | Click       | `mod_tooltip(type = "shinyhelper")` |
-| **prompter**    | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) | Hover       | `mod_tooltip(type = "prompter")`    |
-| **shinyalert**  | `shinyalert` + delegated JS                                                  | Click       | `mod_tooltip(type = "shinyalert")`  |
-| **reactable**   | native `title` attribute                                                     | Hover       | `mod_hoverinfo(type = "reactable")` |
+| Tab | Package | Interaction | Helper |
+|----|----|----|----|
+| **bslib** | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) | Click | `mod_tooltip(type = "bslib")` |
+| **shinyhelper** | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html) | Click | `mod_tooltip(type = "shinyhelper")` |
+| **prompter** | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) | Hover | `mod_tooltip(type = "prompter")` |
+| **shinyalert** | `shinyalert` + delegated JS | Click | `mod_tooltip(type = "shinyalert")` |
+| **reactable** | native `title` attribute | Hover | `mod_hoverinfo(type = "reactable")` |
 
 ## Data utilities
 
@@ -46,6 +49,7 @@ The package exports a small set of financial data helpers you can use
 outside Shiny:
 
 ``` r
+
 prices  <- get_stock_prices(c("AAPL", "MSFT"), from = "2024-01-01")
 returns <- get_stock_returns(prices)
 perf    <- summarise_performance(returns)
@@ -61,6 +65,7 @@ ff3 <- get_ff3_factors("2020-01-01", "2023-12-31")
 provides a single interface across all click/hover back-ends:
 
 ``` r
+
 # bslib popover (click)
 mod_tooltip(
   type     = "bslib",
@@ -81,6 +86,7 @@ mod_tooltip(
 formats hover content for `reactable` table cells:
 
 ``` r
+
 reactable::colDef(
   name = "Ann. Return (%)",
   html = TRUE,
@@ -101,6 +107,7 @@ All modules use the `logger` package. Set the threshold once at session
 start:
 
 ``` r
+
 app_set_log_threshold(logger::DEBUG)  # verbose (development)
 app_set_log_threshold(logger::WARN)   # quiet   (production)
 ```

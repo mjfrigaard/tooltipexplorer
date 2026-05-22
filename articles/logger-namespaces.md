@@ -13,15 +13,15 @@ development and route messages selectively in production.
 
 `logger` defines seven levels from most to least verbose:
 
-| Level     | Function        | When to use                                                  |
-|-----------|-----------------|--------------------------------------------------------------|
-| `TRACE`   | `log_trace()`   | Fine-grained internal steps (loops, branches)                |
-| `DEBUG`   | `log_debug()`   | Per-reactive / per-call diagnostics                          |
-| `INFO`    | `log_info()`    | Key lifecycle events (session start, fetch, render complete) |
-| `SUCCESS` | `log_success()` | Explicit success confirmations                               |
-| `WARN`    | `log_warn()`    | Recoverable issues (empty ticker list, unexpected input)     |
-| `ERROR`   | `log_error()`   | Caught errors before re-throwing                             |
-| `FATAL`   | `log_fatal()`   | Unrecoverable failures                                       |
+| Level | Function | When to use |
+|----|----|----|
+| `TRACE` | `log_trace()` | Fine-grained internal steps (loops, branches) |
+| `DEBUG` | `log_debug()` | Per-reactive / per-call diagnostics |
+| `INFO` | `log_info()` | Key lifecycle events (session start, fetch, render complete) |
+| `SUCCESS` | `log_success()` | Explicit success confirmations |
+| `WARN` | `log_warn()` | Recoverable issues (empty ticker list, unexpected input) |
+| `ERROR` | `log_error()` | Caught errors before re-throwing |
+| `FATAL` | `log_fatal()` | Unrecoverable failures |
 
 The package default threshold is `INFO`: `DEBUG` and `TRACE` lines are
 silent unless you explicitly lower the threshold.
@@ -35,15 +35,15 @@ Every `logger::log_*()` call in **tooltipexplorer** passes an explicit
 [`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md),
 is:
 
-| Namespace                     | File                       | Covers                                              |
-|-------------------------------|----------------------------|-----------------------------------------------------|
-| `"global"`                    | —                          | logger’s built-in global namespace (fallback)       |
-| `"tooltipexplorer/app"`       | `app_ui.R`, `app_server.R` | UI construction, session lifecycle, module wiring   |
-| `"tooltipexplorer/inputs"`    | `mod_inputs.R`             | Fetch-button events, reactive inputs list           |
-| `"tooltipexplorer/outputs"`   | `mod_outputs.R`            | Price fetch, returns, performance, all render calls |
-| `"tooltipexplorer/download"`  | `mod_download.R`           | Filename generation, report render                  |
-| `"tooltipexplorer/tooltip"`   | `mod_tooltip.R`            | Tooltip helper dispatch                             |
-| `"tooltipexplorer/hoverinfo"` | `mod_hoverinfo.R`          | Hover-span construction                             |
+| Namespace | File | Covers |
+|----|----|----|
+| `"global"` | — | logger’s built-in global namespace (fallback) |
+| `"tooltipexplorer/app"` | `app_ui.R`, `app_server.R` | UI construction, session lifecycle, module wiring |
+| `"tooltipexplorer/inputs"` | `mod_inputs.R` | Fetch-button events, reactive inputs list |
+| `"tooltipexplorer/outputs"` | `mod_outputs.R` | Price fetch, returns, performance, all render calls |
+| `"tooltipexplorer/download"` | `mod_download.R` | Filename generation, report render |
+| `"tooltipexplorer/tooltip"` | `mod_tooltip.R` | Tooltip helper dispatch |
+| `"tooltipexplorer/hoverinfo"` | `mod_hoverinfo.R` | Hover-span construction |
 
 The `"tooltipexplorer/<module>"` convention means you can silence one
 noisy module while keeping the others verbose — see the examples below.
@@ -64,6 +64,7 @@ for each entry. Its return value (a list of `NULL`s) is discarded — only
 `level` is returned invisibly.
 
 ``` r
+
 app_set_log_threshold <- function(level = logger::INFO) {
   namespaces <- c(
     "global",
@@ -82,6 +83,7 @@ app_set_log_threshold <- function(level = logger::INFO) {
 ### Common threshold recipes
 
 ``` r
+
 # Default (production) — INFO and above only
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 
@@ -108,6 +110,7 @@ you can override individual namespaces with
 directly:
 
 ``` r
+
 # Make the outputs module verbose while keeping everything else at INFO
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")
@@ -119,6 +122,7 @@ logger::log_threshold(logger::FATAL, namespace = "tooltipexplorer/download")
 ### Reading back the current threshold
 
 ``` r
+
 # Returns the current level for a given namespace
 logger::log_threshold(namespace = "tooltipexplorer/outputs")
 ```
@@ -134,6 +138,7 @@ label to every message, and then re-issues the condition so Shiny and
 the caller continue to see it normally.
 
 ``` r
+
 with_logging <- function(expr, context = "", ns = "tooltipexplorer/app") {
   tryCatch(
     withCallingHandlers(
@@ -162,6 +167,7 @@ is used in three places in
 [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md):
 
 ``` r
+
 # Wiring the inputs module
 inputs_r <- with_logging(
   mod_inputs_server("inputs"),
@@ -188,6 +194,7 @@ And inside module server functions themselves, wrapping individual
 output renderers:
 
 ``` r
+
 output$bslib_boxes <- shiny::renderUI({
   shiny::req(perf_r())
   with_logging(
@@ -211,24 +218,24 @@ output$bslib_boxes <- shiny::renderUI({
 
 ### `app_ui()` and `app_server()` — namespace `"tooltipexplorer/app"`
 
-| Event                                                                                                             | Level            |
-|-------------------------------------------------------------------------------------------------------------------|------------------|
-| `"Building app UI"`                                                                                               | `INFO`           |
-| `"Session started | session_id: ..."`                                                                             | `INFO`           |
-| `"mod_inputs_server() ready"`                                                                                     | `INFO`           |
-| `"mod_outputs_server() ready"`                                                                                    | `INFO`           |
-| `"mod_download_server() ready"`                                                                                   | `INFO`           |
-| `"Session ended | session_id: ..."`                                                                               | `INFO`           |
+| Event | Level |
+|----|----|
+| `"Building app UI"` | `INFO` |
+| `"Session started | session_id: ..."` | `INFO` |
+| `"mod_inputs_server() ready"` | `INFO` |
+| `"mod_outputs_server() ready"` | `INFO` |
+| `"mod_download_server() ready"` | `INFO` |
+| `"Session ended | session_id: ..."` | `INFO` |
 | Any warning/error from [`with_logging()`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md) | `WARN` / `ERROR` |
 
 ### `mod_inputs_server()` — namespace `"tooltipexplorer/inputs"`
 
-| Event                                                                             | Level   |
-|-----------------------------------------------------------------------------------|---------|
-| `"mod_inputs_server() initialised | id: ..."`                                     | `DEBUG` |
-| `"Fetch button pressed | tickers: [...] | from: ... | to: ... | vol_window: ..."` | `INFO`  |
-| `"Fetch pressed with no tickers selected"`                                        | `WARN`  |
-| `"Inputs reactive evaluated | tickers: [...]"`                                    | `DEBUG` |
+| Event | Level |
+|----|----|
+| `"mod_inputs_server() initialised | id: ..."` | `DEBUG` |
+| `"Fetch button pressed | tickers: [...] | from: ... | to: ... | vol_window: ..."` | `INFO` |
+| `"Fetch pressed with no tickers selected"` | `WARN` |
+| `"Inputs reactive evaluated | tickers: [...]"` | `DEBUG` |
 
 ### `mod_outputs_server()` — namespace `"tooltipexplorer/outputs"`
 
@@ -281,6 +288,7 @@ expressions are evaluated in the calling environment at the time the log
 call is made:
 
 ``` r
+
 # Structured fields separated by " | "
 logger::log_info(
   "Fetching prices | tickers: [{paste(tickers, collapse = ', ')}] | from: {from} | to: {to}",
@@ -306,6 +314,7 @@ By default `logger` writes to the console. To add a file appender
 alongside the console appender:
 
 ``` r
+
 # Append all INFO+ messages to a rotating log file
 logger::log_appender(
   logger::appender_tee(file = "tooltipexplorer.log"),
@@ -316,6 +325,7 @@ logger::log_appender(
 Or route a specific namespace to its own file:
 
 ``` r
+
 logger::log_appender(
   logger::appender_file("outputs.log"),
   namespace = "tooltipexplorer/outputs"
@@ -327,6 +337,7 @@ logger::log_appender(
 ## Quick-reference: development setup
 
 ``` r
+
 # 1. Load the package
 devtools::load_all()
 

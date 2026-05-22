@@ -37,6 +37,7 @@ Each module lives in a single file containing both its `_ui()` and
 ## Launching the app
 
 ``` r
+
 tooltipexplorer::launch()
 ```
 
@@ -52,11 +53,11 @@ forwarded to
 
 ### Entry points
 
-| File           | Function                                                                               | Role                                                                                                    |
-|----------------|----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `launch.R`     | [`launch()`](https://mjfrigaard.github.io/tooltipexplorer/reference/launch.md)         | Creates and runs the Shiny app                                                                          |
-| `app_ui.R`     | [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md)         | Top-level [`bslib::page_sidebar()`](https://rstudio.github.io/bslib/reference/page_sidebar.html) layout |
-| `app_server.R` | [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md) | Wires all module servers together                                                                       |
+| File | Function | Role |
+|----|----|----|
+| `launch.R` | [`launch()`](https://mjfrigaard.github.io/tooltipexplorer/reference/launch.md) | Creates and runs the Shiny app |
+| `app_ui.R` | [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md) | Top-level [`bslib::page_sidebar()`](https://rstudio.github.io/bslib/reference/page_sidebar.html) layout |
+| `app_server.R` | [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md) | Wires all module servers together |
 
 ### Reactive flow
 
@@ -103,6 +104,7 @@ with:
 **`mod_inputs_server(id)`** — returns a **reactive list**:
 
 ``` r
+
 list(
   tickers    = character(),   # selected ticker symbols
   from       = Sys.Date(),    # start date
@@ -154,18 +156,19 @@ via
 
 Financial data is fetched and processed through four functions:
 
-| File                      | Function                                | Description                                                                                                           |
-|---------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `get_stock_prices.R`      | `get_stock_prices(tickers, from, to)`   | Daily adjusted prices via [`tidyquant::tq_get()`](https://business-science.github.io/tidyquant/reference/tq_get.html) |
-| `get_stock_returns.R`     | `get_stock_returns(prices)`             | Daily log returns: `log(adjusted / lag(adjusted))`                                                                    |
-| `compute_rolling_vol.R`   | `compute_rolling_vol(returns, window)`  | Rolling annualised volatility via [`slider::slide_dbl()`](https://slider.r-lib.org/reference/slide.html)              |
-| `summarise_performance.R` | `summarise_performance(returns)`        | Per-ticker ann. return, ann. vol, Sharpe ratio                                                                        |
-| `get_ff3_factors.R`       | `get_ff3_factors(start_date, end_date)` | Fama-French 3-factor data via `tidyfinance`                                                                           |
-| `default_tickers.R`       | `default_tickers`                       | Character vector of default mega-cap tickers                                                                          |
+| File | Function | Description |
+|----|----|----|
+| `get_stock_prices.R` | `get_stock_prices(tickers, from, to)` | Daily adjusted prices via [`tidyquant::tq_get()`](https://business-science.github.io/tidyquant/reference/tq_get.html) |
+| `get_stock_returns.R` | `get_stock_returns(prices)` | Daily log returns: `log(adjusted / lag(adjusted))` |
+| `compute_rolling_vol.R` | `compute_rolling_vol(returns, window)` | Rolling annualised volatility via [`slider::slide_dbl()`](https://slider.r-lib.org/reference/slide.html) |
+| `summarise_performance.R` | `summarise_performance(returns)` | Per-ticker ann. return, ann. vol, Sharpe ratio |
+| `get_ff3_factors.R` | `get_ff3_factors(start_date, end_date)` | Fama-French 3-factor data via `tidyfinance` |
+| `default_tickers.R` | `default_tickers` | Character vector of default mega-cap tickers |
 
 ### Example usage outside Shiny
 
 ``` r
+
 library(tooltipexplorer)
 
 prices  <- get_stock_prices(c("AAPL", "MSFT"), from = "2024-01-01")
@@ -188,6 +191,7 @@ server-side counterpart. Place it anywhere inside a UI tree, including
 inside `renderUI()`.
 
 ``` r
+
 mod_tooltip(
   trigger     = bsicons::bs_icon("info-circle"),  # default
   type        = c("bslib", "shinyhelper", "prompter", "shinyalert"),
@@ -201,16 +205,17 @@ mod_tooltip(
 )
 ```
 
-| `type`          | Back-end                                                                     | Interaction | Extra `...` args                                              |
-|-----------------|------------------------------------------------------------------------------|-------------|---------------------------------------------------------------|
-| `"bslib"`       | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) | Click       | `title`, `placement`                                          |
-| `"shinyhelper"` | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html)   | Click       | `title`, `colour`, `icon`, `buttonLabel`, `easyClose`, `fade` |
-| `"prompter"`    | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) | Hover       | `position`, `rounded`, `bounce`, `arrow`, `animate`           |
-| `"shinyalert"`  | `data-sa-*` attrs + delegated JS                                             | Click       | `title`, `confirmButtonText`                                  |
+| `type` | Back-end | Interaction | Extra `...` args |
+|----|----|----|----|
+| `"bslib"` | [`bslib::popover()`](https://rstudio.github.io/bslib/reference/popover.html) | Click | `title`, `placement` |
+| `"shinyhelper"` | [`shinyhelper::helper()`](https://rdrr.io/pkg/shinyhelper/man/helper.html) | Click | `title`, `colour`, `icon`, `buttonLabel`, `easyClose`, `fade` |
+| `"prompter"` | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) | Hover | `position`, `rounded`, `bounce`, `arrow`, `animate` |
+| `"shinyalert"` | `data-sa-*` attrs + delegated JS | Click | `title`, `confirmButtonText` |
 
 #### bslib example
 
 ``` r
+
 mod_tooltip(
   type     = "bslib",
   contents = "Annualised log return = mean daily log return \u00d7 252.",
@@ -236,6 +241,7 @@ mod_tooltip(
 ***In `app_ui.R`:***
 
 ``` r
+
 shiny::tags$script(htmltools::HTML(
   "$(document).on('click', '.shinyhelper-icon', function(e) {",
   "  e.stopImmediatePropagation();",
@@ -254,6 +260,7 @@ shiny::tags$script(htmltools::HTML(
 ```
 
 ``` r
+
 mod_tooltip(
   trigger     = shiny::tags$span("Sharpe Ratio"),
   type        = "shinyhelper",
@@ -267,6 +274,7 @@ mod_tooltip(
 #### prompter example
 
 ``` r
+
 mod_tooltip(
   trigger  = shiny::tags$span("Ann. Vol"),
   type     = "prompter",
@@ -301,6 +309,7 @@ shiny::tags$script(htmltools::HTML(
 No `observeEvent()` or server handler is needed:
 
 ``` r
+
 mod_tooltip(
   trigger           = shiny::tags$span(class = "fs-4 fw-bold", "AAPL"),
   type              = "shinyalert",
@@ -320,6 +329,7 @@ for back-ends that build tooltips programmatically inside table-cell
 renderers.
 
 ``` r
+
 mod_hoverinfo(
   type     = "reactable",   # currently the only supported back-end
   contents = character(0),  # tooltip text; named vector → "Name: value" pairs
@@ -335,6 +345,7 @@ render this as a native tooltip on hover. Use inside
 `reactable::colDef(cell = ..., html = TRUE)`.
 
 ``` r
+
 reactable::colDef(
   name = "Ann. Return (%)",
   html = TRUE,
@@ -356,11 +367,11 @@ reactable::colDef(
 
 ## Logging utilities
 
-| File                      | Function                          | Description                                           |
-|---------------------------|-----------------------------------|-------------------------------------------------------|
-| `app_set_log_threshold.R` | `app_set_log_threshold(level)`    | Sets `logger` threshold across all package namespaces |
-| `with_logging.R`          | `with_logging(expr, context, ns)` | `tryCatch` wrapper that logs warnings and errors      |
-| `utils_operators.R`       | `%||%`                            | Null-coalescing operator                              |
+| File | Function | Description |
+|----|----|----|
+| `app_set_log_threshold.R` | `app_set_log_threshold(level)` | Sets `logger` threshold across all package namespaces |
+| `with_logging.R` | `with_logging(expr, context, ns)` | `tryCatch` wrapper that logs warnings and errors |
+| `utils_operators.R` | `%||%` | Null-coalescing operator |
 
 [`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md)
 is called once in
@@ -370,6 +381,7 @@ at session start. Pass
 during development for verbose output:
 
 ``` r
+
 # In app_server(), or interactively:
 app_set_log_threshold(logger::DEBUG)
 ```
@@ -378,10 +390,10 @@ app_set_log_threshold(logger::DEBUG)
 
 ## Decision guide
 
-| Where does the tooltip appear?  | Use                                                                                          | `type`          |
-|---------------------------------|----------------------------------------------------------------------------------------------|-----------------|
-| Input label / icon in sidebar   | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)     | `"bslib"`       |
-| Metric card with help modal     | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)     | `"shinyhelper"` |
-| Metric label — CSS hover        | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)     | `"prompter"`    |
-| Clickable element → modal alert | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)     | `"shinyalert"`  |
-| reactable table cell            | [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md) | `"reactable"`   |
+| Where does the tooltip appear? | Use | `type` |
+|----|----|----|
+| Input label / icon in sidebar | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | `"bslib"` |
+| Metric card with help modal | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | `"shinyhelper"` |
+| Metric label — CSS hover | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | `"prompter"` |
+| Clickable element → modal alert | [`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md) | `"shinyalert"` |
+| reactable table cell | [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md) | `"reactable"` |
