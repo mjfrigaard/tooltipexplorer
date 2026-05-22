@@ -7,8 +7,8 @@
 app_set_log_threshold(level = logger::INFO)
 }
 \arguments{
-\item{level}{A \code{logger} log-level object, e.g. \link[logger:log_levels]{logger::DEBUG},
-\link[logger:log_levels]{logger::INFO} (default), \link[logger:log_levels]{logger::WARN}.}
+\item{level}{A \code{logger} log-level object, e.g. \link[logger:DEBUG]{logger::DEBUG},
+\link[logger:INFO]{logger::INFO} (default), \link[logger:WARN]{logger::WARN}.}
 }
 \value{
 Invisibly returns \code{level}.

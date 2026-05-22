@@ -6,3 +6,7 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.positai$
+^\.claude$

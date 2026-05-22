@@ -14,7 +14,7 @@ A \code{shiny::tagList()} ready to embed in \code{\link[=app_ui]{app_ui()}}.
 }
 \description{
 Main content area: a \code{shiny::uiOutput()} for KPI value boxes and a
-\code{\link[bslib:navset]{bslib::navset_card_tab()}} with one tab per tooltip/hover-info demo
+\code{\link[bslib:navset_card_tab]{bslib::navset_card_tab()}} with one tab per tooltip/hover-info demo
 (bslib, shinyhelper, prompter, shinyalert, reactable).
 }
 \seealso{

@@ -21,9 +21,9 @@ The value of \code{expr} on success; re-throws on error.
 \description{
 Wraps \code{expr} in a \code{tryCatch()} that:
 \itemize{
-\item logs warnings via \code{\link[logger:log_level]{logger::log_warn()}} and re-issues them so Shiny can
+\item logs warnings via \code{\link[logger:log_warn]{logger::log_warn()}} and re-issues them so Shiny can
 also handle them
-\item logs errors via \code{\link[logger:log_level]{logger::log_error()}} and re-throws so the caller /
+\item logs errors via \code{\link[logger:log_error]{logger::log_error()}} and re-throws so the caller /
 Shiny sees the error normally
 }
 }
