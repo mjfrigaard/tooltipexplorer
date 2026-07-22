@@ -11,6 +11,13 @@ Entry points for creating and running the Shiny application.
 - [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
   : Application server
 
+## Theme
+
+Dark, Bloomberg-terminal styling applied to the app UI.
+
+- [`tooltipexplorer_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/tooltipexplorer_theme.md)
+  : Setup tooltipexplorer theme and styling
+
 ## Modules
 
 Shiny modules following the `mod_<name>_ui()` / `mod_<name>_server()`

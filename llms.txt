@@ -132,6 +132,13 @@ Entry points for creating and running the Shiny application.
 - [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
   : Application server
 
+## Theme
+
+Dark, Bloomberg-terminal styling applied to the app UI.
+
+- [`tooltipexplorer_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/tooltipexplorer_theme.md)
+  : Setup tooltipexplorer theme and styling
+
 ## Modules
 
 Shiny modules following the `mod_<name>_ui()` / `mod_<name>_server()`
@@ -202,5 +209,6 @@ Logging helpers and operators.
 
 - [Module
   structure](https://mjfrigaard.github.io/tooltipexplorer/articles/modules.md):
+- [Theme](https://mjfrigaard.github.io/tooltipexplorer/articles/theme.md):
 - [Logging with logger: namespaces and
   thresholds](https://mjfrigaard.github.io/tooltipexplorer/articles/logger-namespaces.md):

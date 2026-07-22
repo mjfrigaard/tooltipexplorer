@@ -9,5 +9,6 @@
 
 - [Module
   structure](https://mjfrigaard.github.io/tooltipexplorer/articles/modules.md):
+- [Theme](https://mjfrigaard.github.io/tooltipexplorer/articles/theme.md):
 - [Logging with logger: namespaces and
   thresholds](https://mjfrigaard.github.io/tooltipexplorer/articles/logger-namespaces.md):
