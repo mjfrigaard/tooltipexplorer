@@ -1,26 +1,28 @@
 url: https://mjfrigaard.github.io/tooltipexplorer/
 
 navbar:
-  bg: "#05070a"     # near-black navbar, matching the app
-  type: dark        # light/amber text for contrast on the near-black bar
+  bg: primary       # paint the bar with primary (Bloomberg amber)
+  type: dark        # light text for contrast on dark background
   structure:
     left: [intro, reference, articles]
     right: [search, github]
 
 template:
   bootstrap: 5
-  theme: arrow-dark
   bslib:
-    bg:         "#0b0e13"  # Terminal background — near-black
-    fg:         "#d5dde5"  # Body text
-    primary:    "#ff9e1b"  # Bloomberg amber   — links, buttons, navbar accent
-    secondary:  "#8b95a1"  # Muted grey        — neutral text emphasis
-    success:    "#2ecc71"  # Up / green
-    info:       "#4ea1ff"  # Cyan              — softer secondary accent
-    warning:    "#ff6a1a"  # Orange
-    danger:     "#ff4d4f"  # Down / red
-    code-color: "#ffbf57"  # Bright amber      — inline & block code text
-    code-bg:    "#1a1f28"  # Panel-2           — inline & block code background
+    bg: "#0b0e13"          # Terminal background (near-black)
+    fg: "#d5dde5"          # Body text (light grey)
+    primary:   "#ff9e1b"   # Bloomberg amber       — buttons, headings, links
+    secondary: "#00d9ff"   # Cyan                  — hover, secondary accents
+    success:   "#2ecc71"   # Green                 — success, gains
+    info:      "#4ea1ff"   # Bright cyan           — info accents
+    warning:   "#ff9e1b"   # Bloomberg amber       — warning accent
+    danger:    "#ff4d4f"   # Red                   — danger, losses
+    body-bg:   "#0b0e13"   # Dark background
+    body-color: "#d5dde5"  # Light text
+    border-color: "#2a313b" # Dark borders
+    code-color: "#00d9ff"  # Cyan for inline code
+    code-bg:    "#12161d"  # Dark code background
     base_font:
       google: "IBM Plex Mono"
     heading_font:
