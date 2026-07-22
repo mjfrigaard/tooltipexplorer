@@ -14,23 +14,26 @@ Each module lives in a single file containing both its `_ui()` and
 `_server()` functions. All other exported objects have one file each.
 
     R/
-    ├── app_server.R              # app_server()
-    ├── app_set_log_threshold.R   # app_set_log_threshold()
-    ├── app_ui.R                  # app_ui()
-    ├── compute_rolling_vol.R     # compute_rolling_vol()
-    ├── default_tickers.R         # default_tickers  (character vector)
-    ├── get_ff3_factors.R         # get_ff3_factors()
-    ├── get_stock_prices.R        # get_stock_prices()
-    ├── get_stock_returns.R       # get_stock_returns()
-    ├── launch.R                  # launch()
-    ├── mod_download.R            # mod_download_ui()  +  mod_download_server()
-    ├── mod_hoverinfo.R           # mod_hoverinfo()
-    ├── mod_inputs.R              # mod_inputs_ui()    +  mod_inputs_server()
-    ├── mod_outputs.R             # mod_outputs_ui()   +  mod_outputs_server()
-    ├── mod_tooltip.R             # mod_tooltip()
-    ├── summarise_performance.R   # summarise_performance()
-    ├── utils_operators.R         # %||%
-    └── with_logging.R            # with_logging()
+    ├── app_server.R              # Wires together function-based modules by calling mod_inputs_server("inputs"), mod_outputs_server("outputs", ...), mod_download_server("download", ...) sequentially; passes reactive values between them.
+    ├── app_set_log_threshold.R   # Logging configuration setup (initializes logger threshold)
+    ├── app_ui.R                  # Top-level UI function; calls mod_inputs_ui(), mod_outputs_ui(), mod_download_ui() to compose the page
+    ├── compute_rolling_vol.R     # Computes rolling volatility metric for stock analysis
+    ├── custom_head.R             # Helper function for displaying data in a compact format
+    ├── default_tickers.R         # Exports default ticker symbols as a package constant 
+    ├── get_ff3_factors.R         # Fetches Fama-French 3-factor data from external source
+    ├── get_stock_prices.R        # Fetches historical stock price data from API
+    ├── get_stock_returns.R       # Calculates stock returns from price data. 
+    ├── launch.R                  # App entry point; calls shinyApp(ui, server)
+    ├── mod_download.R            # Function-based download module; pairs mod_download_ui() and mod_download_server(id) in one file.
+    ├── mod_hoverinfo.R           # Helper that wraps hover/tooltip text for reactable table cells
+    ├── mod_inputs.R              # Function-based inputs module; contains mod_inputs_ui(id) and mod_inputs_server(id) returning reactive list.
+    ├── mod_outputs.R             # Function-based outputs module; consumes inputs_r and renders performance metrics.
+    ├── mod_tooltip.R             # Tooltip icon helper component
+    ├── setup_theme.R             # Theme and styling configuration  
+    ├── summarise_performance.R   # Calculates performance summary metrics (returns, Sharpe ratio, etc.)
+    ├── utils_operators.R         # Custom operators (%>%, %||%, etc.)
+    ├── utils_reactable_theme.R   # reactable table theme utilities
+    └── with_logging.R            # Logging wrapper utility for side-effect tracking
 
 ------------------------------------------------------------------------
 
