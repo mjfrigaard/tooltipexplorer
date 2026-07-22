@@ -24,11 +24,11 @@ template:
     code-color: "#00d9ff"  # Cyan for inline code
     code-bg:    "#12161d"  # Dark code background
     base_font:
-      google: "IBM Plex Mono"
+      google: "Ubuntu"
     heading_font:
-      google: "IBM Plex Mono"
+      google: "Ubuntu"
     code_font:
-      google: "IBM Plex Mono"
+      google: "Ubuntu Mono"
 
 articles:
   - title: "Getting started"
