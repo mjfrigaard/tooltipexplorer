@@ -19,6 +19,7 @@
 #'
 #' @export
 launch <- function(...) {
+  options(reactable.theme = utils_reactable_theme())
   shiny::shinyApp(
     ui     = app_ui(),
     server = app_server,

@@ -16,7 +16,8 @@ mod_inputs_ui <- function(id) {
 
   bslib::sidebar(
     width = 280,
-    bg    = "#f8f9fa",
+    bg    = "#12161d",
+    fg    = "#d5dde5",
 
     # ── Ticker picker ──────────────────────────────────────────────────────
     shiny::selectizeInput(
@@ -28,7 +29,7 @@ mod_inputs_ui <- function(id) {
           type     = "bslib",
           contents = "Enter one or more stock ticker symbols (e.g. AAPL, MSFT).",
           size     = "0.85rem",
-          style    = "color:#6c757d"
+          style    = "color:#8b95a1"
         )
       ),
       choices  = tooltipexplorer::default_tickers,
@@ -61,7 +62,7 @@ mod_inputs_ui <- function(id) {
           type     = "bslib",
           contents = "Number of trading days used for the rolling volatility calculation.",
           size     = "0.85rem",
-          style    = "color:#6c757d"
+          style    = "color:#8b95a1"
         )
       ),
       min   = 5L,

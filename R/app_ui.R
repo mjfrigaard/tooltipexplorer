@@ -20,15 +20,11 @@ app_ui <- function() {
         bsicons::bs_icon("bar-chart-steps"),
         " Tooltip Explorer"
       ),
-      theme = bslib::bs_theme(
-        version    = 5,
-        bootswatch = "flatly",
-        primary    = "#2c7bb6",
-        base_font  = bslib::font_google("Inter")
-      ),
+      theme = tooltipexplorer_theme(),
       fillable = FALSE,
 
       # ── HEAD extras ─────────────────────────────────────────────────────
+      tooltipexplorer_head(),
       shiny::tags$head(
         # shinyalert JS — required for the delegated .sa-trigger handler.
         shinyalert::useShinyalert(force = TRUE),

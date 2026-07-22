@@ -220,7 +220,13 @@ mod_outputs_server <- function(id, inputs_r) {
           boxes <- lapply(seq_len(nrow(df)), function(i) {
             row    <- df[i, ]
             sharpe <- round(row$sharpe, 2)
-            theme  <- if (sharpe >= 1) "success" else if (sharpe >= 0) "warning" else "danger"
+            theme  <- if (sharpe >= 1) {
+              bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")
+            } else if (sharpe >= 0) {
+              "warning"
+            } else {
+              "danger"
+            }
 
             bslib::value_box(
               title    = row$symbol,
@@ -483,7 +489,7 @@ mod_outputs_server <- function(id, inputs_r) {
                     ),
                     display  = glue::glue("{value}%"),
                     style    = paste0(
-                      "color:", if (value >= 0) "#198754" else "#dc3545",
+                      "color:", if (value >= 0) "#2ecc71" else "#ff4d4f",
                       "; cursor:help"
                     )
                   )
@@ -509,7 +515,7 @@ mod_outputs_server <- function(id, inputs_r) {
                 name = "Sharpe",
                 html = TRUE,
                 cell = function(value, index) {
-                  col <- if (value >= 1) "#198754" else if (value >= 0) "#fd7e14" else "#dc3545"
+                  col <- if (value >= 1) "#2ecc71" else if (value >= 0) "#ff6a1a" else "#ff4d4f"
                   mod_hoverinfo(
                     type     = "reactable",
                     contents = glue::glue(

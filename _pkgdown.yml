@@ -1,30 +1,32 @@
 url: https://mjfrigaard.github.io/tooltipexplorer/
 
 navbar:
-  bg: primary       # paint the bar with $primary (Atomic Blue)
-  type: dark        # light text for contrast on the deep blue bar
+  bg: "#05070a"     # near-black navbar, matching the app
+  type: dark        # light/amber text for contrast on the near-black bar
   structure:
     left: [intro, reference, articles]
     right: [search, github]
 
 template:
   bootstrap: 5
-  theme: arrow-light
+  theme: arrow-dark
   bslib:
-    primary:   "#1E5F8C"   # Atomic Blue       — links, buttons, navbar
-    secondary: "#2B2B2B"   # Eames Charcoal    — neutral text emphasis
-    success:   "#7B8B47"   # Avocado / Olive   — retro success accent
-    info:      "#4FA5B5"   # Robin's-Egg Blue  — softer secondary blue
-    warning:   "#E87B2D"   # Atomic Tangerine  — primary orange accent
-    danger:    "#B0411C"   # Burnt Sienna      — deep orange danger
-    code-color: "#16486D"  # Deep Atomic Blue  — inline & block code text
-    code-bg:    "#FDEFE0"  # Pale Tangerine    — inline & block code background
+    bg:         "#0b0e13"  # Terminal background — near-black
+    fg:         "#d5dde5"  # Body text
+    primary:    "#ff9e1b"  # Bloomberg amber   — links, buttons, navbar accent
+    secondary:  "#8b95a1"  # Muted grey        — neutral text emphasis
+    success:    "#2ecc71"  # Up / green
+    info:       "#4ea1ff"  # Cyan              — softer secondary accent
+    warning:    "#ff6a1a"  # Orange
+    danger:     "#ff4d4f"  # Down / red
+    code-color: "#ffbf57"  # Bright amber      — inline & block code text
+    code-bg:    "#1a1f28"  # Panel-2           — inline & block code background
     base_font:
-      google: Ubuntu
+      google: "IBM Plex Mono"
     heading_font:
-      google: Fira Sans Condensed
+      google: "IBM Plex Mono"
     code_font:
-      google: Ubuntu Mono
+      google: "IBM Plex Mono"
 
 articles:
   - title: "Getting started"
@@ -35,6 +37,7 @@ articles:
     navbar: ~
     contents:
       - modules
+      - theme
       - logger-namespaces
 
 reference:
@@ -44,6 +47,11 @@ reference:
       - launch
       - app_ui
       - app_server
+
+  - title: "Theme"
+    desc: "Dark, Bloomberg-terminal styling applied to the app UI."
+    contents:
+      - tooltipexplorer_theme
 
   - title: "Modules"
     desc: >

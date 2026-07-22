@@ -4,3 +4,6 @@ inst/doc
 docs
 .Rproj.user
 .positai
+
+/.quarto/
+**/*.quarto_ipynb

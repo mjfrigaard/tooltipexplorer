@@ -1,0 +1,161 @@
+---
+title: "Theme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Theme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tooltipexplorer)
+```
+
+## Overview
+
+`tooltipexplorer` ships a dark, Bloomberg-terminal aesthetic: a near-black
+background, amber primary accent, green / red / cyan data colors, and IBM
+Plex Mono typography throughout. The look is produced by three cooperating
+pieces.
+
+### Color palette
+
+Every surface draws from one shared set of CSS custom properties, defined in
+`tooltipexplorer_head()`:
+
+| Token | Hex | Role |
+|-------|-----|------|
+| `--bbg-bg` | `#0b0e13` | App background (near-black) |
+| `--bbg-panel` | `#12161d` | Cards, tables, sidebar |
+| `--bbg-panel-2` | `#1a1f28` | Headers, inputs, hovers |
+| `--bbg-border` | `#2a313b` | Borders and gridlines |
+| `--bbg-amber` | `#ff9e1b` | Primary / brand accent |
+| `--bbg-amber-2` | `#ffbf57` | Hover / bright amber |
+| `--bbg-orange` | `#ff6a1a` | Warning |
+| `--bbg-green` | `#2ecc71` | Success / up |
+| `--bbg-red` | `#ff4d4f` | Danger / down |
+| `--bbg-cyan` | `#4ea1ff` | Info / links |
+| `--bbg-text` | `#d5dde5` | Body text |
+| `--bbg-dim` | `#8b95a1` | Muted labels |
+| `--bbg-white` | `#f2f5f8` | Headings / values |
+
+Typography is IBM Plex Mono throughout (headings, body, and code), giving the
+app a fixed-width terminal feel.
+
+### Helper functions
+
+**`tooltipexplorer_theme()`**: Exported. Returns a `bslib::bs_theme()` object
+passed to `theme =` in `bslib::page_sidebar()` inside `app_ui()`. It sets the
+semantic Bootstrap colors (`primary` amber, `success` green, `warning`
+orange, `danger` red, `info` cyan), the dark `bg` / `fg`, panel and border
+variables, and IBM Plex Mono as the base, heading, and monospace font.
+
+**`tooltipexplorer_head()`**: Internal (`@noRd`), called by `app_ui()`. Emits
+the `<head>` tags: the Google Fonts link for IBM Plex Mono / Sans and the
+inline `<style>` block that defines the palette tokens above and styles
+navbar, cards, value boxes, buttons, tabs, tables, alerts, the sidebar,
+scrollbars, a `.rt-*` reactable fallback, and the third-party widgets that
+don't inherit `bslib` theme variables automatically — `selectize` (ticker
+picker), `ionRangeSlider` (rolling-vol window), `bootstrap-datepicker` (date
+range), popovers, and the `shinyhelper` modal.
+
+**`utils_reactable_theme()`**: Internal. Returns a `reactable::reactableTheme()`
+matching the palette (dark panels, amber uppercase headers, mono tabular
+numerals, amber row highlight, dark search / filter / select inputs).
+`launch()` installs it globally with
+`options(reactable.theme = utils_reactable_theme())`, so the reactable demo
+table inherits it with no per-call theming.
+
+### Sidebar and value boxes
+
+Two spots set colors directly rather than through the shared theme:
+
+- `mod_inputs_ui()` passes `bg = "#12161d"` / `fg = "#d5dde5"` to
+  `bslib::sidebar()` so the sidebar panel matches `--bbg-panel` / `--bbg-text`
+  instead of bslib's default light sidebar background.
+- `mod_outputs_server()` gives the KPI value boxes a custom
+  `bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")` (amber / near-black)
+  for Sharpe ratios `>= 1`, in place of the Bootstrap `"success"` (green)
+  theme, so the strongest performers read as amber-on-black to match the
+  primary accent. `"warning"` and `"danger"` are used unchanged for the
+  middle and low Sharpe tiers.
+
+```{r value-box-theme, eval = FALSE}
+theme <- if (sharpe >= 1) {
+  bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")
+} else if (sharpe >= 0) {
+  "warning"
+} else {
+  "danger"
+}
+```
+
+### Module call structure
+
+How the theme pieces are wired together, from the entry point down:
+
+```{r ast-theme, comment = "", message = FALSE, echo = FALSE, eval = FALSE}
+library(lobstr)
+lobstr::ast(
+  launch(
+    options(reactable.theme = utils_reactable_theme()),
+    shinyApp(
+      app_ui(
+        theme = tooltipexplorer_theme(),
+        tooltipexplorer_head()
+      ),
+      app_server()
+    )
+  )
+)
+```
+
+```{verbatim}
+█─launch
+├─█─options
+│ └─reactable.theme = █─utils_reactable_theme
+└─█─shinyApp
+  ├─█─app_ui
+  │ ├─theme = █─tooltipexplorer_theme
+  │ └─█─tooltipexplorer_head
+  └─█─app_server
+```
+
+### Implementation
+
+**Theme files:**
+
+- `R/setup_theme.R`: `tooltipexplorer_theme()`
+- `R/custom_head.R`: `tooltipexplorer_head()` with inline CSS injection
+- `R/utils_reactable_theme.R`: `utils_reactable_theme()`
+
+Unlike a stand-alone stylesheet, all custom CSS lives in the single
+`tooltipexplorer_head()` `<style>` block — there is no external `.css` file
+to keep in sync.
+
+## pkgdown site
+
+The documentation site (`_pkgdown.yml`) mirrors the same palette so the
+reference site and the running app feel like one product:
+
+| `_pkgdown.yml` bslib var | Value | App equivalent |
+|--------------------------|-------|-----------------|
+| `bg` | `#0b0e13` | `--bbg-bg` |
+| `fg` | `#d5dde5` | `--bbg-text` |
+| `primary` | `#ff9e1b` | `--bbg-amber` |
+| `secondary` | `#8b95a1` | `--bbg-dim` |
+| `success` | `#2ecc71` | `--bbg-green` |
+| `info` | `#4ea1ff` | `--bbg-cyan` |
+| `warning` | `#ff6a1a` | `--bbg-orange` |
+| `danger` | `#ff4d4f` | `--bbg-red` |
+| `base_font` / `heading_font` / `code_font` | IBM Plex Mono | `--bbg-mono` |
+
+`template: theme` uses a dark syntax-highlighting theme so code blocks read
+against the same near-black background as the rest of the site.
