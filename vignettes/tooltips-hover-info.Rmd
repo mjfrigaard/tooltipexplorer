@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-**tooltipexplorer** is a Shiny application-package for demoing and comparing tooltip and hover-info approaches in R using real financial data from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and [tidyquant](https://business-science.github.io/tidyquant/).
+**`tooltipexplorer`** is a Shiny application-package for demoing and comparing tooltip and hover-info approaches in R using real financial data from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and [tidyquant](https://business-science.github.io/tidyquant/).
 
 ------------------------------------------------------------------------
 
@@ -45,7 +45,6 @@ R/
 ├── utils_operators.R         # Custom operators (%>%, %||%, etc.)
 ├── utils_reactable_theme.R   # reactable table theme utilities
 └── with_logging.R            # Logging wrapper utility for side-effect tracking
-
 ```
 
 ------------------------------------------------------------------------
@@ -100,11 +99,11 @@ All modules follow the `mod_<name>_ui()` / `mod_<name>_server()` convention and 
 
 **`mod_inputs_ui(id)`** — returns a `bslib::sidebar()` with:
 
-- `selectizeInput` — ticker picker (multi-select, user-creatable)
-- `dateRangeInput` — date range
-- `sliderInput` — rolling-volatility window (5–120 trading days)
-- `actionButton` — "Fetch data"
-- `mod_download_ui()` embedded at the bottom
+-   `selectizeInput` — ticker picker (multi-select, user-creatable)
+-   `dateRangeInput` — date range
+-   `sliderInput` — rolling-volatility window (5–120 trading days)
+-   `actionButton` — "Fetch data"
+-   `mod_download_ui()` embedded at the bottom
 
 **`mod_inputs_server(id)`** — returns a **reactive list**:
 
@@ -122,8 +121,8 @@ list(
 
 **`mod_outputs_ui(id)`** — returns a `shiny::tagList()` containing:
 
-- `shiny::uiOutput` — KPI value boxes (one per ticker)
-- `bslib::navset_card_tab()` — five demo tabs (see below)
+-   `shiny::uiOutput` — KPI value boxes (one per ticker)
+-   `bslib::navset_card_tab()` — five demo tabs (see below)
 
 **`mod_outputs_server(id, inputs_r)`** — triggered by `inputs_r()$fetch`:
 
@@ -174,7 +173,7 @@ Two helper functions provide a uniform interface for attaching tooltip and hover
 
 ### `mod_tooltip()`
 
-A **UI helper** (in `mod_tooltip.R`) — returns a `shiny.tag` with no server-side counterpart. Place it anywhere inside a UI tree, including inside `renderUI()`.
+The UIhelper (in `mod_tooltip.R`) returns a `shiny.tag` with no server-side counterpart. Place it anywhere inside a UI tree, including inside `renderUI()`.
 
 ```{r}
 mod_tooltip(
@@ -197,7 +196,7 @@ mod_tooltip(
 | `"prompter"` | `prompter::add_prompt()` | Hover | `position`, `rounded`, `bounce`, `arrow`, `animate` |
 | `"shinyalert"` | `data-sa-*` attrs + delegated JS | Click | `title`, `confirmButtonText` |
 
-#### bslib example
+#### `bslib` example
 
 ```{r}
 mod_tooltip(
@@ -207,13 +206,13 @@ mod_tooltip(
 )
 ```
 
-#### shinyhelper example
+#### `shinyhelper` example
 
-- `shinyhelper`'s own `.on('click', '.shinyhelper-icon')` binding runs once at page load, so it misses icons injected later by `renderUI`.
+-   `shinyhelper`'s own `.on('click', '.shinyhelper-icon')` binding runs once at page load, so it misses icons injected later by `renderUI`.
 
-  - This document-level delegated handler catches every click regardless of when the icon was inserted, stops the (now-duplicate) built-in handler via `stopImmediatePropagation()`, then sets the same input that `shinyhelper`'s `observe_helpers()` `shiny::observeEvent()` listens on.
+    -   This document-level delegated handler catches every click regardless of when the icon was inserted, stops the (now-duplicate) built-in handler via `stopImmediatePropagation()`, then sets the same input that `shinyhelper`'s `observe_helpers()` `shiny::observeEvent()` listens on.
 
-- `{priority: 'event'}` ensures re-firing when the same ticker is clicked twice in a row (identical value would otherwise be dropped).
+-   `{priority: 'event'}` ensures re-firing when the same ticker is clicked twice in a row (identical value would otherwise be dropped).
 
 ***In `app_ui.R`:***
 
@@ -246,7 +245,7 @@ mod_tooltip(
 )
 ```
 
-#### prompter example
+#### `prompter` example
 
 ```{r}
 mod_tooltip(
@@ -257,7 +256,7 @@ mod_tooltip(
 )
 ```
 
-#### shinyalert example
+#### `shinyalert` example
 
 The `shinyalert` back-end stores content in `data-sa-*` attributes and fires on click via a delegated `jQuery` handler injected once in `app_ui()`.
 
@@ -295,7 +294,7 @@ mod_tooltip(
 
 ### `mod_hoverinfo()`
 
-A **rendering helper** (in `mod_hoverinfo.R`) — formats hover content for back-ends that build tooltips programmatically inside table-cell renderers.
+A **r**endering helper (in `mod_hoverinfo.R`) formats hover content for back-ends that build tooltips programmatically inside table-cell renderers.
 
 ```{r}
 mod_hoverinfo(
@@ -308,7 +307,7 @@ mod_hoverinfo(
 )
 ```
 
-Returns an `htmltools` `<span>` with a `title` attribute — browsers render this as a native tooltip on hover. Use inside `reactable::colDef(cell = ..., html = TRUE)`.
+Returns an `htmltools` `<span>` with a `title` attribute. Browsers render this as a native tooltip on hover. Use inside `reactable::colDef(cell = ..., html = TRUE)`.
 
 ```{r}
 reactable::colDef(
