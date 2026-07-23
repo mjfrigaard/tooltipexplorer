@@ -1,6 +1,6 @@
 # Logging with logger: namespaces and thresholds
 
-**tooltipexplorer** uses the
+`tooltipexplorer` uses the
 [`logger`](https://daroczig.github.io/logger/) package for structured,
 namespace-aware logging throughout the application. Every log call
 carries a `namespace` argument that identifies exactly which module or
@@ -30,7 +30,7 @@ silent unless you explicitly lower the threshold.
 
 ## Namespaces in this package
 
-Every `logger::log_*()` call in **tooltipexplorer** passes an explicit
+Every `logger::log_*()` call in `tooltipexplorer` passes an explicit
 `namespace` string. The full set, registered in
 [`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md),
 is:
@@ -56,7 +56,6 @@ This is the single entry point for changing thresholds. It is called
 once per session in
 [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
 and applies the same level to every namespace in the table above.
-
 [`lapply()`](https://rdrr.io/r/base/lapply.html) iterates over the
 namespace vector, calling
 [`logger::log_threshold()`](https://daroczig.github.io/logger/reference/log_threshold.html)
@@ -96,8 +95,8 @@ tooltipexplorer::app_set_log_threshold(logger::WARN)
 
 You can call
 [`app_set_log_threshold()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_set_log_threshold.md)
-interactively at any time while the app is running — the threshold
-change takes effect immediately for all subsequent log calls.
+interactively at any time while the app is running. The threshold change
+takes effect immediately for all subsequent log calls.
 
 ------------------------------------------------------------------------
 
@@ -214,9 +213,13 @@ output$bslib_boxes <- shiny::renderUI({
 
 ------------------------------------------------------------------------
 
-## Log-level patterns by module
+## Log-level patterns
 
-### `app_ui()` and `app_server()` — namespace `"tooltipexplorer/app"`
+Below are the log levels used in the application. The logging namespaces
+are helpful for pinpointing where/when execution occurs, and can be
+useful for debugging.
+
+### `app_ui()` and `app_server()`: namespace `"tooltipexplorer/app"`
 
 | Event | Level |
 |----|----|
@@ -228,7 +231,7 @@ output$bslib_boxes <- shiny::renderUI({
 | `"Session ended | session_id: ..."` | `INFO` |
 | Any warning/error from [`with_logging()`](https://mjfrigaard.github.io/tooltipexplorer/reference/with_logging.md) | `WARN` / `ERROR` |
 
-### `mod_inputs_server()` — namespace `"tooltipexplorer/inputs"`
+### `mod_inputs_server()`: namespace `"tooltipexplorer/inputs"`
 
 | Event | Level |
 |----|----|
@@ -237,7 +240,7 @@ output$bslib_boxes <- shiny::renderUI({
 | `"Fetch pressed with no tickers selected"` | `WARN` |
 | `"Inputs reactive evaluated | tickers: [...]"` | `DEBUG` |
 
-### `mod_outputs_server()` — namespace `"tooltipexplorer/outputs"`
+### `mod_outputs_server()`: namespace `"tooltipexplorer/outputs"`
 
 | Event                                                      | Level   |
 |------------------------------------------------------------|---------|
@@ -258,7 +261,7 @@ output$bslib_boxes <- shiny::renderUI({
 | `"Rendering shinyalert cards | n: ..."`                    | `DEBUG` |
 | `"Rendering reactable table | n: ..."`                     | `DEBUG` |
 
-### `mod_download_server()` — namespace `"tooltipexplorer/download"`
+### `mod_download_server()`: namespace `"tooltipexplorer/download"`
 
 | Event                                                     | Level   |
 |-----------------------------------------------------------|---------|
@@ -270,7 +273,7 @@ output$bslib_boxes <- shiny::renderUI({
 | `"rmarkdown::render() failed | format: ... | error: ..."` | `ERROR` |
 | `"Report render complete | format: ... | file: ..."`      | `INFO`  |
 
-### `mod_hoverinfo()` — namespace `"tooltipexplorer/hoverinfo"`
+### `mod_hoverinfo()`: namespace `"tooltipexplorer/hoverinfo"`
 
 | Event                                                    | Level   |
 |----------------------------------------------------------|---------|
@@ -283,9 +286,9 @@ output$bslib_boxes <- shiny::renderUI({
 ## Log message format
 
 All messages use `logger`’s
-[`glue`](https://glue.tidyverse.org/)-interpolation syntax — curly-brace
-expressions are evaluated in the calling environment at the time the log
-call is made:
+[`glue`](https://glue.tidyverse.org/)-interpolation syntax (i.e.,
+curly-brace expressions are evaluated in the calling environment at the
+time the log call is made).
 
 ``` r
 

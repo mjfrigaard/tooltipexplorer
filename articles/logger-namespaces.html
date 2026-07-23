@@ -68,7 +68,7 @@
 
     
     
-<p><strong>tooltipexplorer</strong> uses the <a href="https://daroczig.github.io/logger/" class="external-link"><code>logger</code></a>
+<p><code>tooltipexplorer</code> uses the <a href="https://daroczig.github.io/logger/" class="external-link"><code>logger</code></a>
 package for structured, namespace-aware logging throughout the
 application. Every log call carries a <code>namespace</code> argument
 that identifies exactly which module or layer emitted the message,
@@ -138,8 +138,8 @@ explicitly lower the threshold.</p>
 <h2 id="namespaces-in-this-package">Namespaces in this package<a class="anchor" aria-label="anchor" href="#namespaces-in-this-package"></a>
 </h2>
 <p>Every <code>logger::log_*()</code> call in
-<strong>tooltipexplorer</strong> passes an explicit
-<code>namespace</code> string. The full set, registered in
+<code>tooltipexplorer</code> passes an explicit <code>namespace</code>
+string. The full set, registered in
 <code><a href="../reference/app_set_log_threshold.html">app_set_log_threshold()</a></code>, is:</p>
 <table class="table">
 <colgroup>
@@ -203,11 +203,10 @@ the examples below.</p>
 </h2>
 <p>This is the single entry point for changing thresholds. It is called
 once per session in <code><a href="../reference/app_server.html">app_server()</a></code> and applies the same level
-to every namespace in the table above.</p>
-<p><code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> iterates over the namespace vector, calling
-<code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code> for each entry. Its return value (a
-list of <code>NULL</code>s) is discarded — only <code>level</code> is
-returned invisibly.</p>
+to every namespace in the table above. <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> iterates
+over the namespace vector, calling <code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code>
+for each entry. Its return value (a list of <code>NULL</code>s) is
+discarded — only <code>level</code> is returned invisibly.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_set_log_threshold</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">level</span> <span class="op">=</span> <span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">namespaces</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -235,7 +234,7 @@ returned invisibly.</p>
 <span><span class="co"># Silent except for warnings and errors</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">WARN</a></span><span class="op">)</span></span></code></pre></div>
 <p>You can call <code><a href="../reference/app_set_log_threshold.html">app_set_log_threshold()</a></code> interactively at
-any time while the app is running — the threshold change takes effect
+any time while the app is running. The threshold change takes effect
 immediately for all subsequent log calls.</p>
 <hr>
 </div>
@@ -337,11 +336,14 @@ output renderers:</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="log-level-patterns-by-module">Log-level patterns by module<a class="anchor" aria-label="anchor" href="#log-level-patterns-by-module"></a>
+<h2 id="log-level-patterns">Log-level patterns<a class="anchor" aria-label="anchor" href="#log-level-patterns"></a>
 </h2>
+<p>Below are the log levels used in the application. The logging
+namespaces are helpful for pinpointing where/when execution occurs, and
+can be useful for debugging.</p>
 <div class="section level3">
 <h3 id="app_ui-and-app_server-namespace-tooltipexplorerapp">
-<code>app_ui()</code> and <code>app_server()</code> — namespace
+<code>app_ui()</code> and <code>app_server()</code>: namespace
 <code>"tooltipexplorer/app"</code><a class="anchor" aria-label="anchor" href="#app_ui-and-app_server-namespace-tooltipexplorerapp"></a>
 </h3>
 <table class="table">
@@ -386,7 +388,7 @@ output renderers:</p>
 </div>
 <div class="section level3">
 <h3 id="mod_inputs_server-namespace-tooltipexplorerinputs">
-<code>mod_inputs_server()</code> — namespace
+<code>mod_inputs_server()</code>: namespace
 <code>"tooltipexplorer/inputs"</code><a class="anchor" aria-label="anchor" href="#mod_inputs_server-namespace-tooltipexplorerinputs"></a>
 </h3>
 <table class="table">
@@ -420,7 +422,7 @@ output renderers:</p>
 </div>
 <div class="section level3">
 <h3 id="mod_outputs_server-namespace-tooltipexploreroutputs">
-<code>mod_outputs_server()</code> — namespace
+<code>mod_outputs_server()</code>: namespace
 <code>"tooltipexplorer/outputs"</code><a class="anchor" aria-label="anchor" href="#mod_outputs_server-namespace-tooltipexploreroutputs"></a>
 </h3>
 <table class="table">
@@ -498,7 +500,7 @@ output renderers:</p>
 </div>
 <div class="section level3">
 <h3 id="mod_download_server-namespace-tooltipexplorerdownload">
-<code>mod_download_server()</code> — namespace
+<code>mod_download_server()</code>: namespace
 <code>"tooltipexplorer/download"</code><a class="anchor" aria-label="anchor" href="#mod_download_server-namespace-tooltipexplorerdownload"></a>
 </h3>
 <table class="table">
@@ -540,7 +542,7 @@ output renderers:</p>
 </div>
 <div class="section level3">
 <h3 id="mod_hoverinfo-namespace-tooltipexplorerhoverinfo">
-<code>mod_hoverinfo()</code> — namespace
+<code>mod_hoverinfo()</code>: namespace
 <code>"tooltipexplorer/hoverinfo"</code><a class="anchor" aria-label="anchor" href="#mod_hoverinfo-namespace-tooltipexplorerhoverinfo"></a>
 </h3>
 <table class="table">
@@ -570,8 +572,8 @@ output renderers:</p>
 <h2 id="log-message-format">Log message format<a class="anchor" aria-label="anchor" href="#log-message-format"></a>
 </h2>
 <p>All messages use <code>logger</code>’s <a href="https://glue.tidyverse.org/" class="external-link"><code>glue</code></a>-interpolation
-syntax — curly-brace expressions are evaluated in the calling
-environment at the time the log call is made:</p>
+syntax (i.e., curly-brace expressions are evaluated in the calling
+environment at the time the log call is made).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Structured fields separated by " | "</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_level.html" class="external-link">log_info</a></span><span class="op">(</span></span>

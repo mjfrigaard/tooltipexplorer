@@ -22,7 +22,7 @@ The two tooltip helpers
 ([`mod_tooltip()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_tooltip.md)
 and
 [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md))
-are *not* modules in the Shiny sense — they have no server counterpart
+are *not* modules in the Shiny sense; they have no server counterpart
 and no `moduleServer()` call.
 
 They are UI / rendering helpers that happen to share the `mod_` prefix
@@ -51,8 +51,8 @@ app_ui <- function() {
 
 [`app_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_server.md)
 wires the three server functions together. The outputs server returns a
-reactive (`perf_r`) that the download server consumes — this is the only
-inter-module dependency.
+reactive (`perf_r`) that the download server consumes (his is the only
+inter-module dependency).
 
 ``` r
 
@@ -69,7 +69,7 @@ The reactive data flow is strictly top-down:
 
     mod_inputs_server()  ──► inputs_r  ──► mod_outputs_server()  ──► perf_r  ──► mod_download_server()
 
-**No module reaches up into its parent or sideways into a sibling.**
+No module reaches up into its parent or sideways into a sibling.
 
 ------------------------------------------------------------------------
 
@@ -166,8 +166,8 @@ with two pieces:
 
 ### Server function
 
-**`mod_outputs_server(id, inputs_r)` is the computational core of the
-app**. It registers
+**`mod_outputs_server(id, inputs_r)`** is the computational core of the
+app. It registers
 [`shinyhelper::observe_helpers()`](https://rdrr.io/pkg/shinyhelper/man/observe_helpers.html)
 once per session (required by `shinyhelper`; do not call it separately
 in
@@ -213,7 +213,7 @@ The value boxes are colored by Sharpe ratio threshold:
 theme <- if (sharpe >= 1) "success" else if (sharpe >= 0) "warning" else "danger"
 ```
 
-### reactable tab and `mod_hoverinfo()`
+### `reactable` tab and `mod_hoverinfo()`
 
 The `reactable` tab is the only output that uses
 [`mod_hoverinfo()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_hoverinfo.md).
@@ -244,7 +244,7 @@ reactable::colDef(
 
 ------------------------------------------------------------------------
 
-## Downloads: mod_download
+## Downloads: `mod_download`
 
 **Files:** `R/mod_download.R`  
 **Exports:**
@@ -310,8 +310,8 @@ These two functions share the `mod_` prefix but are not Shiny modules.
 
 ### `mod_tooltip()`
 
-A **UI helper** — returns a `shiny.tag` with no server counterpart.
-Place it anywhere inside a UI tree, including inside `renderUI()`.
+A UI helper — returns a `shiny.tag` with no server counterpart. Place it
+anywhere inside a UI tree, including inside `renderUI()`.
 
 ``` r
 
@@ -330,8 +330,8 @@ mod_tooltip(
 
 ### `mod_hoverinfo()`
 
-A **rendering helper** — returns an `htmltools` `<span title="...">` for
-use inside `reactable::colDef(cell = ..., html = TRUE)`.
+A rendering helper — returns an `htmltools` `<span title="...">` for use
+inside `reactable::colDef(cell = ..., html = TRUE)`.
 
 ``` r
 

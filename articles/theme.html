@@ -167,29 +167,28 @@ giving the app a fixed-width terminal feel.</p>
 <div class="section level3">
 <h3 id="helper-functions">Helper functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a>
 </h3>
-<p><strong><code><a href="../reference/tooltipexplorer_theme.html">tooltipexplorer_theme()</a></code></strong>: Exported.
-Returns a <code><a href="https://rstudio.github.io/bslib/reference/bs_theme.html" class="external-link">bslib::bs_theme()</a></code> object passed to
-<code>theme =</code> in <code><a href="https://rstudio.github.io/bslib/reference/page_sidebar.html" class="external-link">bslib::page_sidebar()</a></code> inside
-<code><a href="../reference/app_ui.html">app_ui()</a></code>. It sets the semantic Bootstrap colors
-(<code>primary</code> amber, <code>success</code> green,
-<code>warning</code> orange, <code>danger</code> red, <code>info</code>
-cyan), the dark <code>bg</code> / <code>fg</code>, panel and border
-variables, and IBM Plex Mono as the base, heading, and monospace
-font.</p>
-<p><strong><code>tooltipexplorer_head()</code></strong>: Internal
-(<code>@noRd</code>), called by <code><a href="../reference/app_ui.html">app_ui()</a></code>. Emits the
-<code>&lt;head&gt;</code> tags: the Google Fonts link for IBM Plex Mono
-/ Sans and the inline <code>&lt;style&gt;</code> block that defines the
-palette tokens above and styles navbar, cards, value boxes, buttons,
-tabs, tables, alerts, the sidebar, scrollbars, a <code>.rt-*</code>
-reactable fallback, and the third-party widgets that don’t inherit
-<code>bslib</code> theme variables automatically —
-<code>selectize</code> (ticker picker), <code>ionRangeSlider</code>
-(rolling-vol window), <code>bootstrap-datepicker</code> (date range),
-popovers, and the <code>shinyhelper</code> modal.</p>
-<p><strong><code><a href="../reference/utils_reactable_theme.html">utils_reactable_theme()</a></code></strong>: Internal.
-Returns a <code><a href="https://glin.github.io/reactable/reference/reactableTheme.html" class="external-link">reactable::reactableTheme()</a></code> matching the palette
-(dark panels, amber uppercase headers, mono tabular numerals, amber row
+<p><code><a href="../reference/tooltipexplorer_theme.html">tooltipexplorer_theme()</a></code>: Exported. Returns a
+<code><a href="https://rstudio.github.io/bslib/reference/bs_theme.html" class="external-link">bslib::bs_theme()</a></code> object passed to <code>theme =</code> in
+<code><a href="https://rstudio.github.io/bslib/reference/page_sidebar.html" class="external-link">bslib::page_sidebar()</a></code> inside <code><a href="../reference/app_ui.html">app_ui()</a></code>. It sets
+the semantic Bootstrap colors (<code>primary</code> amber,
+<code>success</code> green, <code>warning</code> orange,
+<code>danger</code> red, <code>info</code> cyan), the dark
+<code>bg</code> / <code>fg</code>, panel and border variables, and IBM
+Plex Mono as the base, heading, and monospace font.</p>
+<p><code>tooltipexplorer_head()</code>: Internal (<code>@noRd</code>),
+called by <code><a href="../reference/app_ui.html">app_ui()</a></code>. Emits the <code>&lt;head&gt;</code>
+tags: the Google Fonts link for IBM Plex Mono / Sans and the inline
+<code>&lt;style&gt;</code> block that defines the palette tokens above
+and styles navbar, cards, value boxes, buttons, tabs, tables, alerts,
+the sidebar, scrollbars, a <code>.rt-*</code> reactable fallback, and
+the third-party widgets that don’t inherit <code>bslib</code> theme
+variables automatically — <code>selectize</code> (ticker picker),
+<code>ionRangeSlider</code> (rolling-vol window),
+<code>bootstrap-datepicker</code> (date range), popovers, and the
+<code>shinyhelper</code> modal.</p>
+<p><code><a href="../reference/utils_reactable_theme.html">utils_reactable_theme()</a></code>: Internal. Returns a
+<code><a href="https://glin.github.io/reactable/reference/reactableTheme.html" class="external-link">reactable::reactableTheme()</a></code> matching the palette (dark
+panels, amber uppercase headers, mono tabular numerals, amber row
 highlight, dark search / filter / select inputs). <code><a href="../reference/launch.html">launch()</a></code>
 installs it globally with
 <code>options(reactable.theme = utils_reactable_theme())</code>, so the
@@ -261,16 +260,17 @@ there is no external <code>.css</code> file to keep in sync.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="pkgdown-site">pkgdown site<a class="anchor" aria-label="anchor" href="#pkgdown-site"></a>
+<h2 id="pkgdown-site">
+<code>pkgdown</code> site<a class="anchor" aria-label="anchor" href="#pkgdown-site"></a>
 </h2>
 <p>The documentation site (<code>_pkgdown.yml</code>) mirrors the same
 palette so the reference site and the running app feel like one
 product:</p>
 <table class="table">
 <colgroup>
-<col width="52%">
-<col width="14%">
-<col width="34%">
+<col width="47%">
+<col width="22%">
+<col width="30%">
 </colgroup>
 <thead><tr class="header">
 <th>

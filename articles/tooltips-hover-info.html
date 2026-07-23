@@ -68,10 +68,10 @@
 
     
     
-<p><strong>tooltipexplorer</strong> is a Shiny application-package for
-demoing and comparing tooltip and hover-info approaches in R using real
-financial data from <a href="https://www.tidy-finance.org/r/" class="external-link">Tidy
-Finance</a> (<code>tidyfinance</code>) and <a href="https://business-science.github.io/tidyquant/" class="external-link">tidyquant</a>.</p>
+<p><strong><code>tooltipexplorer</code></strong> is a Shiny
+application-package for demoing and comparing tooltip and hover-info
+approaches in R using real financial data from <a href="https://www.tidy-finance.org/r/" class="external-link">Tidy Finance</a>
+(<code>tidyfinance</code>) and <a href="https://business-science.github.io/tidyquant/" class="external-link">tidyquant</a>.</p>
 <hr>
 <div class="section level2">
 <h2 id="package-structure">Package structure<a class="anchor" aria-label="anchor" href="#package-structure"></a>
@@ -99,8 +99,7 @@ exported objects have one file each.</p>
 ├── summarise_performance.R   # Calculates performance summary metrics (returns, Sharpe ratio, etc.)
 ├── utils_operators.R         # Custom operators (%&gt;%, %||%, etc.)
 ├── utils_reactable_theme.R   # reactable table theme utilities
-└── with_logging.R            # Logging wrapper utility for side-effect tracking
-</code></pre>
+└── with_logging.R            # Logging wrapper utility for side-effect tracking</code></pre>
 <hr>
 </div>
 <div class="section level2">
@@ -327,10 +326,9 @@ tooltip and hover content across all five back-ends.</p>
 <h3 id="mod_tooltip">
 <code>mod_tooltip()</code><a class="anchor" aria-label="anchor" href="#mod_tooltip"></a>
 </h3>
-<p>A <strong>UI helper</strong> (in <code>mod_tooltip.R</code>) —
-returns a <code>shiny.tag</code> with no server-side counterpart. Place
-it anywhere inside a UI tree, including inside
-<code>renderUI()</code>.</p>
+<p>The UIhelper (in <code>mod_tooltip.R</code>) returns a
+<code>shiny.tag</code> with no server-side counterpart. Place it
+anywhere inside a UI tree, including inside <code>renderUI()</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger     <span class="op">=</span> <span class="fu">bsicons</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bsicons/man/bs_icon.html" class="external-link">bs_icon</a></span><span class="op">(</span><span class="st">"info-circle"</span><span class="op">)</span>,  <span class="co"># default</span></span>
@@ -395,7 +393,8 @@ it anywhere inside a UI tree, including inside
 </tbody>
 </table>
 <div class="section level4">
-<h4 id="bslib-example">bslib example<a class="anchor" aria-label="anchor" href="#bslib-example"></a>
+<h4 id="bslib-example">
+<code>bslib</code> example<a class="anchor" aria-label="anchor" href="#bslib-example"></a>
 </h4>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
@@ -405,7 +404,8 @@ it anywhere inside a UI tree, including inside
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="shinyhelper-example">shinyhelper example<a class="anchor" aria-label="anchor" href="#shinyhelper-example"></a>
+<h4 id="shinyhelper-example">
+<code>shinyhelper</code> example<a class="anchor" aria-label="anchor" href="#shinyhelper-example"></a>
 </h4>
 <ul>
 <li>
@@ -452,7 +452,8 @@ dropped).</p></li>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="prompter-example">prompter example<a class="anchor" aria-label="anchor" href="#prompter-example"></a>
+<h4 id="prompter-example">
+<code>prompter</code> example<a class="anchor" aria-label="anchor" href="#prompter-example"></a>
 </h4>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
@@ -463,7 +464,8 @@ dropped).</p></li>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="shinyalert-example">shinyalert example<a class="anchor" aria-label="anchor" href="#shinyalert-example"></a>
+<h4 id="shinyalert-example">
+<code>shinyalert</code> example<a class="anchor" aria-label="anchor" href="#shinyalert-example"></a>
 </h4>
 <p>The <code>shinyalert</code> back-end stores content in
 <code>data-sa-*</code> attributes and fires on click via a delegated
@@ -498,9 +500,9 @@ dropped).</p></li>
 <h3 id="mod_hoverinfo">
 <code>mod_hoverinfo()</code><a class="anchor" aria-label="anchor" href="#mod_hoverinfo"></a>
 </h3>
-<p>A <strong>rendering helper</strong> (in <code>mod_hoverinfo.R</code>)
-— formats hover content for back-ends that build tooltips
-programmatically inside table-cell renderers.</p>
+<p>A <strong>r</strong>endering helper (in <code>mod_hoverinfo.R</code>)
+formats hover content for back-ends that build tooltips programmatically
+inside table-cell renderers.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_hoverinfo.html">mod_hoverinfo</a></span><span class="op">(</span></span>
 <span>  type     <span class="op">=</span> <span class="st">"reactable"</span>,   <span class="co"># currently the only supported back-end</span></span>
@@ -511,7 +513,7 @@ programmatically inside table-cell renderers.</p>
 <span>  <span class="va">...</span>                       <span class="co"># extra HTML attributes on the &lt;span&gt;</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Returns an <code>htmltools</code> <code>&lt;span&gt;</code> with a
-<code>title</code> attribute — browsers render this as a native tooltip
+<code>title</code> attribute. Browsers render this as a native tooltip
 on hover. Use inside
 <code>reactable::colDef(cell = ..., html = TRUE)</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">

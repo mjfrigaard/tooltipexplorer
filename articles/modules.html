@@ -108,7 +108,7 @@ between modules, and the role each module plays.</p>
 </table>
 <p>The two tooltip helpers (<code><a href="../reference/mod_tooltip.html">mod_tooltip()</a></code> and
 <code><a href="../reference/mod_hoverinfo.html">mod_hoverinfo()</a></code>) are <em>not</em> modules in the Shiny
-sense — they have no server counterpart and no
+sense; they have no server counterpart and no
 <code>moduleServer()</code> call.</p>
 <p>They are UI / rendering helpers that happen to share the
 <code>mod_</code> prefix for discoverability.</p>
@@ -130,7 +130,7 @@ level, so the sidebar contains all user controls in one place.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p><code><a href="../reference/app_server.html">app_server()</a></code> wires the three server functions together.
 The outputs server returns a reactive (<code>perf_r</code>) that the
-download server consumes — this is the only inter-module dependency.</p>
+download server consumes (his is the only inter-module dependency).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span></span>
@@ -141,8 +141,7 @@ download server consumes — this is the only inter-module dependency.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The reactive data flow is strictly top-down:</p>
 <pre><code>mod_inputs_server()  ──► inputs_r  ──► mod_outputs_server()  ──► perf_r  ──► mod_download_server()</code></pre>
-<p><strong>No module reaches up into its parent or sideways into a
-sibling.</strong></p>
+<p>No module reaches up into its parent or sideways into a sibling.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -287,8 +286,8 @@ tooltip back-end.</li>
 <div class="section level3">
 <h3 id="server-function-1">Server function<a class="anchor" aria-label="anchor" href="#server-function-1"></a>
 </h3>
-<p><strong><code>mod_outputs_server(id, inputs_r)</code> is the
-computational core of the app</strong>. It registers
+<p><strong><code>mod_outputs_server(id, inputs_r)</code></strong> is the
+computational core of the app. It registers
 <code><a href="https://rdrr.io/pkg/shinyhelper/man/observe_helpers.html" class="external-link">shinyhelper::observe_helpers()</a></code> once per session (required
 by <code>shinyhelper</code>; do not call it separately in
 <code><a href="../reference/app_server.html">app_server()</a></code>), then chains four reactives triggered by
@@ -326,7 +325,8 @@ without re-computing it.</p>
 <code class="sourceCode R"><span><span class="va">theme</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="st">"success"</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="st">"warning"</span> <span class="kw">else</span> <span class="st">"danger"</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="reactable-tab-and-mod_hoverinfo">reactable tab and <code>mod_hoverinfo()</code><a class="anchor" aria-label="anchor" href="#reactable-tab-and-mod_hoverinfo"></a>
+<h3 id="reactable-tab-and-mod_hoverinfo">
+<code>reactable</code> tab and <code>mod_hoverinfo()</code><a class="anchor" aria-label="anchor" href="#reactable-tab-and-mod_hoverinfo"></a>
 </h3>
 <p>The <code>reactable</code> tab is the only output that uses
 <code><a href="../reference/mod_hoverinfo.html">mod_hoverinfo()</a></code>. Each numeric column in the performance
@@ -355,7 +355,7 @@ value in an <code>htmltools</code>
 </div>
 </div>
 <div class="section level2">
-<h2 id="downloads-mod_download">Downloads: mod_download<a class="anchor" aria-label="anchor" href="#downloads-mod_download"></a>
+<h2 id="downloads-mod_download">Downloads: <code>mod_download</code><a class="anchor" aria-label="anchor" href="#downloads-mod_download"></a>
 </h2>
 <p><strong>Files:</strong> <code>R/mod_download.R</code><br><strong>Exports:</strong> <code><a href="../reference/mod_download_ui.html">mod_download_ui()</a></code>,
 <code><a href="../reference/mod_download_server.html">mod_download_server()</a></code></p>
@@ -413,9 +413,9 @@ Shiny modules.</p>
 <h3 id="mod_tooltip">
 <code>mod_tooltip()</code><a class="anchor" aria-label="anchor" href="#mod_tooltip"></a>
 </h3>
-<p>A <strong>UI helper</strong> — returns a <code>shiny.tag</code> with
-no server counterpart. Place it anywhere inside a UI tree, including
-inside <code>renderUI()</code>.</p>
+<p>A UI helper — returns a <code>shiny.tag</code> with no server
+counterpart. Place it anywhere inside a UI tree, including inside
+<code>renderUI()</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_tooltip.html">mod_tooltip</a></span><span class="op">(</span></span>
 <span>  trigger     <span class="op">=</span> <span class="fu">bsicons</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bsicons/man/bs_icon.html" class="external-link">bs_icon</a></span><span class="op">(</span><span class="st">"info-circle"</span><span class="op">)</span>,  <span class="co"># clickable/hoverable element</span></span>
@@ -433,9 +433,9 @@ inside <code>renderUI()</code>.</p>
 <h3 id="mod_hoverinfo">
 <code>mod_hoverinfo()</code><a class="anchor" aria-label="anchor" href="#mod_hoverinfo"></a>
 </h3>
-<p>A <strong>rendering helper</strong> — returns an
-<code>htmltools</code> <code>&lt;span title="..."&gt;</code> for use
-inside <code>reactable::colDef(cell = ..., html = TRUE)</code>.</p>
+<p>A rendering helper — returns an <code>htmltools</code>
+<code>&lt;span title="..."&gt;</code> for use inside
+<code>reactable::colDef(cell = ..., html = TRUE)</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mod_hoverinfo.html">mod_hoverinfo</a></span><span class="op">(</span></span>
 <span>  type     <span class="op">=</span> <span class="st">"reactable"</span>,    <span class="co"># only supported back-end</span></span>

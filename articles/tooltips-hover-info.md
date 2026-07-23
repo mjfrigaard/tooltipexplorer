@@ -1,6 +1,6 @@
 # Tooltip and Hover-Info Explorer
 
-**tooltipexplorer** is a Shiny application-package for demoing and
+**`tooltipexplorer`** is a Shiny application-package for demoing and
 comparing tooltip and hover-info approaches in R using real financial
 data from [Tidy Finance](https://www.tidy-finance.org/r/)
 (`tidyfinance`) and
@@ -189,7 +189,7 @@ and hover content across all five back-ends.
 
 ### `mod_tooltip()`
 
-A **UI helper** (in `mod_tooltip.R`) — returns a `shiny.tag` with no
+The UIhelper (in `mod_tooltip.R`) returns a `shiny.tag` with no
 server-side counterpart. Place it anywhere inside a UI tree, including
 inside `renderUI()`.
 
@@ -215,7 +215,7 @@ mod_tooltip(
 | `"prompter"` | [`prompter::add_prompt()`](https://rdrr.io/pkg/prompter/man/add_prompt.html) | Hover | `position`, `rounded`, `bounce`, `arrow`, `animate` |
 | `"shinyalert"` | `data-sa-*` attrs + delegated JS | Click | `title`, `confirmButtonText` |
 
-#### bslib example
+#### `bslib` example
 
 ``` r
 
@@ -226,7 +226,7 @@ mod_tooltip(
 )
 ```
 
-#### shinyhelper example
+#### `shinyhelper` example
 
 - `shinyhelper`’s own `.on('click', '.shinyhelper-icon')` binding runs
   once at page load, so it misses icons injected later by `renderUI`.
@@ -274,7 +274,7 @@ mod_tooltip(
 )
 ```
 
-#### prompter example
+#### `prompter` example
 
 ``` r
 
@@ -286,7 +286,7 @@ mod_tooltip(
 )
 ```
 
-#### shinyalert example
+#### `shinyalert` example
 
 The `shinyalert` back-end stores content in `data-sa-*` attributes and
 fires on click via a delegated `jQuery` handler injected once in
@@ -327,8 +327,8 @@ mod_tooltip(
 
 ### `mod_hoverinfo()`
 
-A **rendering helper** (in `mod_hoverinfo.R`) — formats hover content
-for back-ends that build tooltips programmatically inside table-cell
+A **r**endering helper (in `mod_hoverinfo.R`) formats hover content for
+back-ends that build tooltips programmatically inside table-cell
 renderers.
 
 ``` r
@@ -343,7 +343,7 @@ mod_hoverinfo(
 )
 ```
 
-Returns an `htmltools` `<span>` with a `title` attribute — browsers
+Returns an `htmltools` `<span>` with a `title` attribute. Browsers
 render this as a native tooltip on hover. Use inside
 `reactable::colDef(cell = ..., html = TRUE)`.
 

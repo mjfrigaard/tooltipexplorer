@@ -43,7 +43,7 @@ giving the app a fixed-width terminal feel.
 
 ### Helper functions
 
-**[`tooltipexplorer_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/tooltipexplorer_theme.md)**:
+[`tooltipexplorer_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/tooltipexplorer_theme.md):
 Exported. Returns a
 [`bslib::bs_theme()`](https://rstudio.github.io/bslib/reference/bs_theme.html)
 object passed to `theme =` in
@@ -55,7 +55,7 @@ It sets the semantic Bootstrap colors (`primary` amber, `success` green,
 panel and border variables, and IBM Plex Mono as the base, heading, and
 monospace font.
 
-**`tooltipexplorer_head()`**: Internal (`@noRd`), called by
+`tooltipexplorer_head()`: Internal (`@noRd`), called by
 [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md).
 Emits the `<head>` tags: the Google Fonts link for IBM Plex Mono / Sans
 and the inline `<style>` block that defines the palette tokens above and
@@ -66,7 +66,7 @@ widgets that don’t inherit `bslib` theme variables automatically —
 `bootstrap-datepicker` (date range), popovers, and the `shinyhelper`
 modal.
 
-**[`utils_reactable_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/utils_reactable_theme.md)**:
+[`utils_reactable_theme()`](https://mjfrigaard.github.io/tooltipexplorer/reference/utils_reactable_theme.md):
 Internal. Returns a
 [`reactable::reactableTheme()`](https://glin.github.io/reactable/reference/reactableTheme.html)
 matching the palette (dark panels, amber uppercase headers, mono tabular
@@ -133,7 +133,7 @@ Unlike a stand-alone stylesheet, all custom CSS lives in the single
 `tooltipexplorer_head()` `<style>` block — there is no external `.css`
 file to keep in sync.
 
-## pkgdown site
+## `pkgdown` site
 
 The documentation site (`_pkgdown.yml`) mirrors the same palette so the
 reference site and the running app feel like one product:
