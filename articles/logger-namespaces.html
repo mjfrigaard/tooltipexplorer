@@ -206,7 +206,7 @@ once per session in <code><a href="../reference/app_server.html">app_server()</a
 to every namespace in the table above. <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> iterates
 over the namespace vector, calling <code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code>
 for each entry. Its return value (a list of <code>NULL</code>s) is
-discarded — only <code>level</code> is returned invisibly.</p>
+discarded (only <code>level</code> is returned invisibly).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_set_log_threshold</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">level</span> <span class="op">=</span> <span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">namespaces</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -225,13 +225,13 @@ discarded — only <code>level</code> is returned invisibly.</p>
 <h3 id="common-threshold-recipes">Common threshold recipes<a class="anchor" aria-label="anchor" href="#common-threshold-recipes"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Default (production) — INFO and above only</span></span>
+<code class="sourceCode R"><span><span class="co"># default (production) — INFO and above only</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Development — everything including DEBUG</span></span>
+<span><span class="co"># dev — everything including DEBUG</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Silent except for warnings and errors</span></span>
+<span><span class="co"># silent except for warnings and errors</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">WARN</a></span><span class="op">)</span></span></code></pre></div>
 <p>You can call <code><a href="../reference/app_set_log_threshold.html">app_set_log_threshold()</a></code> interactively at
 any time while the app is running. The threshold change takes effect
@@ -246,17 +246,17 @@ immediately for all subsequent log calls.</p>
 individual namespaces with <code><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">logger::log_threshold()</a></code>
 directly:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Make the outputs module verbose while keeping everything else at INFO</span></span>
+<code class="sourceCode R"><span><span class="co"># make the outputs module verbose while keeping everything else at INFO</span></span>
 <span><span class="fu">tooltipexplorer</span><span class="fu">::</span><span class="fu"><a href="../reference/app_set_log_threshold.html">app_set_log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">DEBUG</a></span>, namespace <span class="op">=</span> <span class="st">"tooltipexplorer/outputs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Silence the download module entirely</span></span>
+<span><span class="co"># silence the download module entirely</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">FATAL</a></span>, namespace <span class="op">=</span> <span class="st">"tooltipexplorer/download"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="reading-back-the-current-threshold">Reading back the current threshold<a class="anchor" aria-label="anchor" href="#reading-back-the-current-threshold"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Returns the current level for a given namespace</span></span>
+<code class="sourceCode R"><span><span class="co"># returns the current level for a given namespace</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span>namespace <span class="op">=</span> <span class="st">"tooltipexplorer/outputs"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -295,21 +295,21 @@ condition so Shiny and the caller continue to see it normally.</p>
 <p><code><a href="../reference/with_logging.html">with_logging()</a></code> is used in three places in
 <code><a href="../reference/app_server.html">app_server()</a></code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Wiring the inputs module</span></span>
+<code class="sourceCode R"><span><span class="co"># wiring the inputs module</span></span>
 <span><span class="va">inputs_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/with_logging.html">with_logging</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/mod_inputs_server.html">mod_inputs_server</a></span><span class="op">(</span><span class="st">"inputs"</span><span class="op">)</span>,</span>
 <span>  context <span class="op">=</span> <span class="st">"app_server / mod_inputs_server"</span>,</span>
 <span>  ns      <span class="op">=</span> <span class="st">"tooltipexplorer/app"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Wiring the outputs module</span></span>
+<span><span class="co"># wiring the outputs module</span></span>
 <span><span class="va">perf_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/with_logging.html">with_logging</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/mod_outputs_server.html">mod_outputs_server</a></span><span class="op">(</span><span class="st">"outputs"</span>, inputs_r <span class="op">=</span> <span class="va">inputs_r</span><span class="op">)</span>,</span>
 <span>  context <span class="op">=</span> <span class="st">"app_server / mod_outputs_server"</span>,</span>
 <span>  ns      <span class="op">=</span> <span class="st">"tooltipexplorer/app"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Wiring the download module</span></span>
+<span><span class="co"># wiring the download module</span></span>
 <span><span class="fu"><a href="../reference/with_logging.html">with_logging</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/mod_download_server.html">mod_download_server</a></span><span class="op">(</span><span class="st">"download"</span>, inputs_r <span class="op">=</span> <span class="va">inputs_r</span>, perf_r <span class="op">=</span> <span class="va">perf_r</span><span class="op">)</span>,</span>
 <span>  context <span class="op">=</span> <span class="st">"app_server / mod_download_server"</span>,</span>

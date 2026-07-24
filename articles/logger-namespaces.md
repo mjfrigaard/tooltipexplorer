@@ -59,8 +59,8 @@ and applies the same level to every namespace in the table above.
 [`lapply()`](https://rdrr.io/r/base/lapply.html) iterates over the
 namespace vector, calling
 [`logger::log_threshold()`](https://daroczig.github.io/logger/reference/log_threshold.html)
-for each entry. Its return value (a list of `NULL`s) is discarded — only
-`level` is returned invisibly.
+for each entry. Its return value (a list of `NULL`s) is discarded (only
+`level` is returned invisibly).
 
 ``` r
 
@@ -83,13 +83,13 @@ app_set_log_threshold <- function(level = logger::INFO) {
 
 ``` r
 
-# Default (production) — INFO and above only
+# default (production) — INFO and above only
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 
-# Development — everything including DEBUG
+# dev — everything including DEBUG
 tooltipexplorer::app_set_log_threshold(logger::DEBUG)
 
-# Silent except for warnings and errors
+# silent except for warnings and errors
 tooltipexplorer::app_set_log_threshold(logger::WARN)
 ```
 
@@ -110,11 +110,11 @@ directly:
 
 ``` r
 
-# Make the outputs module verbose while keeping everything else at INFO
+# make the outputs module verbose while keeping everything else at INFO
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")
 
-# Silence the download module entirely
+# silence the download module entirely
 logger::log_threshold(logger::FATAL, namespace = "tooltipexplorer/download")
 ```
 
@@ -122,7 +122,7 @@ logger::log_threshold(logger::FATAL, namespace = "tooltipexplorer/download")
 
 ``` r
 
-# Returns the current level for a given namespace
+# returns the current level for a given namespace
 logger::log_threshold(namespace = "tooltipexplorer/outputs")
 ```
 
@@ -167,21 +167,21 @@ is used in three places in
 
 ``` r
 
-# Wiring the inputs module
+# wiring the inputs module
 inputs_r <- with_logging(
   mod_inputs_server("inputs"),
   context = "app_server / mod_inputs_server",
   ns      = "tooltipexplorer/app"
 )
 
-# Wiring the outputs module
+# wiring the outputs module
 perf_r <- with_logging(
   mod_outputs_server("outputs", inputs_r = inputs_r),
   context = "app_server / mod_outputs_server",
   ns      = "tooltipexplorer/app"
 )
 
-# Wiring the download module
+# wiring the download module
 with_logging(
   mod_download_server("download", inputs_r = inputs_r, perf_r = perf_r),
   context = "app_server / mod_download_server",
