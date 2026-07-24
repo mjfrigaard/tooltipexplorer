@@ -53,7 +53,7 @@ The `"tooltipexplorer/<module>"` convention means you can silence one noisy modu
 
 ## `app_set_log_threshold()`
 
-This is the single entry point for changing thresholds. It is called once per session in `app_server()` and applies the same level to every namespace in the table above. `lapply()` iterates over the namespace vector, calling `logger::log_threshold()` for each entry. Its return value (a list of `NULL`s) is discarded — only `level` is returned invisibly.
+This is the single entry point for changing thresholds. It is called once per session in `app_server()` and applies the same level to every namespace in the table above. `lapply()` iterates over the namespace vector, calling `logger::log_threshold()` for each entry. Its return value (a list of `NULL`s) is discarded (only `level` is returned invisibly).
 
 ```{r app_set_log_threshold-source}
 app_set_log_threshold <- function(level = logger::INFO) {
@@ -74,13 +74,13 @@ app_set_log_threshold <- function(level = logger::INFO) {
 ### Common threshold recipes
 
 ```{r threshold-recipes}
-# Default (production) — INFO and above only
+# default (production) — INFO and above only
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 
-# Development — everything including DEBUG
+# dev — everything including DEBUG
 tooltipexplorer::app_set_log_threshold(logger::DEBUG)
 
-# Silent except for warnings and errors
+# silent except for warnings and errors
 tooltipexplorer::app_set_log_threshold(logger::WARN)
 ```
 
@@ -93,18 +93,18 @@ You can call `app_set_log_threshold()` interactively at any time while the app i
 After calling `app_set_log_threshold()` you can override individual namespaces with `logger::log_threshold()` directly:
 
 ```{r per-ns-override}
-# Make the outputs module verbose while keeping everything else at INFO
+# make the outputs module verbose while keeping everything else at INFO
 tooltipexplorer::app_set_log_threshold(logger::INFO)
 logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")
 
-# Silence the download module entirely
+# silence the download module entirely
 logger::log_threshold(logger::FATAL, namespace = "tooltipexplorer/download")
 ```
 
 ### Reading back the current threshold
 
 ```{r read-threshold}
-# Returns the current level for a given namespace
+# returns the current level for a given namespace
 logger::log_threshold(namespace = "tooltipexplorer/outputs")
 ```
 
@@ -141,21 +141,21 @@ with_logging <- function(expr, context = "", ns = "tooltipexplorer/app") {
 `with_logging()` is used in three places in `app_server()`:
 
 ```{r with_logging-in-app-server}
-# Wiring the inputs module
+# wiring the inputs module
 inputs_r <- with_logging(
   mod_inputs_server("inputs"),
   context = "app_server / mod_inputs_server",
   ns      = "tooltipexplorer/app"
 )
 
-# Wiring the outputs module
+# wiring the outputs module
 perf_r <- with_logging(
   mod_outputs_server("outputs", inputs_r = inputs_r),
   context = "app_server / mod_outputs_server",
   ns      = "tooltipexplorer/app"
 )
 
-# Wiring the download module
+# wiring the download module
 with_logging(
   mod_download_server("download", inputs_r = inputs_r, perf_r = perf_r),
   context = "app_server / mod_download_server",
@@ -319,6 +319,6 @@ tooltipexplorer::launch()
 
 ## References
 
--   [logger package documentation](https://daroczig.github.io/logger/)
--   `?tooltipexplorer::app_set_log_threshold`
--   `?tooltipexplorer::with_logging`
+- [logger package documentation](https://daroczig.github.io/logger/)
+- `?tooltipexplorer::app_set_log_threshold`
+- `?tooltipexplorer::with_logging`
