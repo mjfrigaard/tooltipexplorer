@@ -36,9 +36,10 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/tooltips-hover-info.html">Tooltip and Hover-Info Explorer</a></li>
-    <li><a class="dropdown-item" href="../articles/modules.html">Module structure</a></li>
+    <li><a class="dropdown-item" href="../articles/design.html">Design</a></li>
+    <li><a class="dropdown-item" href="../articles/implementation.html">Implementation</a></li>
+    <li><a class="dropdown-item" href="../articles/structure.html">Structure</a></li>
     <li><a class="dropdown-item" href="../articles/theme.html">Theme</a></li>
-    <li><a class="dropdown-item" href="../articles/logger-namespaces.html">Logging with logger: namespaces and thresholds</a></li>
   </ul>
 </li>
       </ul>
@@ -79,8 +80,8 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p><code>tooltipexplorer</code> ships a dark, Bloomberg-terminal
-aesthetic: a near-black background, amber primary accent, green / red /
-cyan data colors, and IBM Plex Mono typography throughout. The look is
+aesthetic: a near-black background, cyan primary accent, amber / green /
+red data colors, and IBM Plex Mono typography throughout. The look is
 produced by three cooperating pieces.</p>
 <div class="section level3">
 <h3 id="color-palette">Color palette<a class="anchor" aria-label="anchor" href="#color-palette"></a>
@@ -115,19 +116,19 @@ defined in <code>tooltipexplorer_head()</code>:</p>
 <td>Borders and gridlines</td>
 </tr>
 <tr class="odd">
-<td><code>--bbg-amber</code></td>
-<td><code>#ff9e1b</code></td>
+<td><code>--bbg-cyan</code></td>
+<td><code>#00d9ff</code></td>
 <td>Primary / brand accent</td>
 </tr>
 <tr class="even">
+<td><code>--bbg-amber</code></td>
+<td><code>#ff9e1b</code></td>
+<td>Secondary / amber accent</td>
+</tr>
+<tr class="odd">
 <td><code>--bbg-amber-2</code></td>
 <td><code>#ffbf57</code></td>
 <td>Hover / bright amber</td>
-</tr>
-<tr class="odd">
-<td><code>--bbg-orange</code></td>
-<td><code>#ff6a1a</code></td>
-<td>Warning</td>
 </tr>
 <tr class="even">
 <td><code>--bbg-green</code></td>
@@ -170,11 +171,12 @@ giving the app a fixed-width terminal feel.</p>
 <p><code><a href="../reference/tooltipexplorer_theme.html">tooltipexplorer_theme()</a></code>: Exported. Returns a
 <code><a href="https://rstudio.github.io/bslib/reference/bs_theme.html" class="external-link">bslib::bs_theme()</a></code> object passed to <code>theme =</code> in
 <code><a href="https://rstudio.github.io/bslib/reference/page_sidebar.html" class="external-link">bslib::page_sidebar()</a></code> inside <code><a href="../reference/app_ui.html">app_ui()</a></code>. It sets
-the semantic Bootstrap colors (<code>primary</code> amber,
-<code>success</code> green, <code>warning</code> orange,
-<code>danger</code> red, <code>info</code> cyan), the dark
-<code>bg</code> / <code>fg</code>, panel and border variables, and IBM
-Plex Mono as the base, heading, and monospace font.</p>
+the semantic Bootstrap colors (<code>primary</code> cyan,
+<code>secondary</code> amber, <code>success</code> green,
+<code>warning</code> amber, <code>danger</code> red, <code>info</code>
+bright cyan), the dark <code>bg</code> / <code>fg</code>, panel and
+border variables, and IBM Plex Mono as the base, heading, and monospace
+font.</p>
 <p><code>tooltipexplorer_head()</code>: Internal (<code>@noRd</code>),
 called by <code><a href="../reference/app_ui.html">app_ui()</a></code>. Emits the <code>&lt;head&gt;</code>
 tags: the Google Fonts link for IBM Plex Mono / Sans and the inline
@@ -207,16 +209,16 @@ sidebar panel matches <code>--bbg-panel</code> / <code>--bbg-text</code>
 instead of bslib’s default light sidebar background.</li>
 <li>
 <code><a href="../reference/mod_outputs_server.html">mod_outputs_server()</a></code> gives the KPI value boxes a custom
-<code>bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")</code>
-(amber / near-black) for Sharpe ratios <code>&gt;= 1</code>, in place of
+<code>bslib::value_box_theme(bg = "#00d9ff", fg = "#05070a")</code>
+(cyan / near-black) for Sharpe ratios <code>&gt;= 1</code>, in place of
 the Bootstrap <code>"success"</code> (green) theme, so the strongest
-performers read as amber-on-black to match the primary accent.
-<code>"warning"</code> and <code>"danger"</code> are used unchanged for
-the middle and low Sharpe tiers.</li>
+performers read as cyan-on-black to match the primary accent.
+<code>"warning"</code> (amber) and <code>"danger"</code> (red) are used
+unchanged for the middle and low Sharpe tiers.</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">theme</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">bslib</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box_theme</a></span><span class="op">(</span>bg <span class="op">=</span> <span class="st">"#ff9e1b"</span>, fg <span class="op">=</span> <span class="st">"#05070a"</span><span class="op">)</span></span>
+<span>  <span class="fu">bslib</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/bslib/reference/value_box.html" class="external-link">value_box_theme</a></span><span class="op">(</span>bg <span class="op">=</span> <span class="st">"#00d9ff"</span>, fg <span class="op">=</span> <span class="st">"#05070a"</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sharpe</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="st">"warning"</span></span>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
@@ -266,10 +268,10 @@ there is no external <code>.css</code> file to keep in sync.</p>
 <p>The documentation site (<code>_pkgdown.yml</code>) mirrors the same
 palette so the reference site and the running app feel like one
 product:</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="47%">
-<col width="22%">
+<col width="45%">
+<col width="24%">
 <col width="30%">
 </colgroup>
 <thead><tr class="header">
@@ -291,13 +293,13 @@ product:</p>
 </tr>
 <tr class="odd">
 <td><code>primary</code></td>
-<td><code>#ff9e1b</code></td>
-<td><code>--bbg-amber</code></td>
+<td><code>#00d9ff</code></td>
+<td><code>--bbg-cyan</code></td>
 </tr>
 <tr class="even">
 <td><code>secondary</code></td>
-<td><code>#8b95a1</code></td>
-<td><code>--bbg-dim</code></td>
+<td><code>#ff9e1b</code></td>
+<td><code>--bbg-amber</code></td>
 </tr>
 <tr class="odd">
 <td><code>success</code></td>
@@ -311,8 +313,8 @@ product:</p>
 </tr>
 <tr class="odd">
 <td><code>warning</code></td>
-<td><code>#ff6a1a</code></td>
-<td><code>--bbg-orange</code></td>
+<td><code>#ff9e1b</code></td>
+<td><code>--bbg-amber</code></td>
 </tr>
 <tr class="even">
 <td><code>danger</code></td>

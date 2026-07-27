@@ -13,7 +13,7 @@ library(tooltipexplorer)
 ## Overview
 
 `tooltipexplorer` ships a dark, Bloomberg-terminal aesthetic: a
-near-black background, amber primary accent, green / red / cyan data
+near-black background, cyan primary accent, amber / green / red data
 colors, and IBM Plex Mono typography throughout. The look is produced by
 three cooperating pieces.
 
@@ -28,9 +28,9 @@ defined in `tooltipexplorer_head()`:
 | `--bbg-panel`   | `#12161d` | Cards, tables, sidebar      |
 | `--bbg-panel-2` | `#1a1f28` | Headers, inputs, hovers     |
 | `--bbg-border`  | `#2a313b` | Borders and gridlines       |
-| `--bbg-amber`   | `#ff9e1b` | Primary / brand accent      |
+| `--bbg-cyan`    | `#00d9ff` | Primary / brand accent      |
+| `--bbg-amber`   | `#ff9e1b` | Secondary / amber accent    |
 | `--bbg-amber-2` | `#ffbf57` | Hover / bright amber        |
-| `--bbg-orange`  | `#ff6a1a` | Warning                     |
 | `--bbg-green`   | `#2ecc71` | Success / up                |
 | `--bbg-red`     | `#ff4d4f` | Danger / down               |
 | `--bbg-cyan`    | `#4ea1ff` | Info / links                |
@@ -50,10 +50,10 @@ object passed to `theme =` in
 [`bslib::page_sidebar()`](https://rstudio.github.io/bslib/reference/page_sidebar.html)
 inside
 [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md).
-It sets the semantic Bootstrap colors (`primary` amber, `success` green,
-`warning` orange, `danger` red, `info` cyan), the dark `bg` / `fg`,
-panel and border variables, and IBM Plex Mono as the base, heading, and
-monospace font.
+It sets the semantic Bootstrap colors (`primary` cyan, `secondary`
+amber, `success` green, `warning` amber, `danger` red, `info` bright
+cyan), the dark `bg` / `fg`, panel and border variables, and IBM Plex
+Mono as the base, heading, and monospace font.
 
 `tooltipexplorer_head()`: Internal (`@noRd`), called by
 [`app_ui()`](https://mjfrigaard.github.io/tooltipexplorer/reference/app_ui.md).
@@ -87,16 +87,17 @@ Two spots set colors directly rather than through the shared theme:
   bslib’s default light sidebar background.
 - [`mod_outputs_server()`](https://mjfrigaard.github.io/tooltipexplorer/reference/mod_outputs_server.md)
   gives the KPI value boxes a custom
-  `bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")` (amber /
+  `bslib::value_box_theme(bg = "#00d9ff", fg = "#05070a")` (cyan /
   near-black) for Sharpe ratios `>= 1`, in place of the Bootstrap
   `"success"` (green) theme, so the strongest performers read as
-  amber-on-black to match the primary accent. `"warning"` and `"danger"`
-  are used unchanged for the middle and low Sharpe tiers.
+  cyan-on-black to match the primary accent. `"warning"` (amber) and
+  `"danger"` (red) are used unchanged for the middle and low Sharpe
+  tiers.
 
 ``` r
 
 theme <- if (sharpe >= 1) {
-  bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")
+  bslib::value_box_theme(bg = "#00d9ff", fg = "#05070a")
 } else if (sharpe >= 0) {
   "warning"
 } else {
@@ -142,11 +143,11 @@ reference site and the running app feel like one product:
 |--------------------------------------------|---------------|----------------|
 | `bg`                                       | `#0b0e13`     | `--bbg-bg`     |
 | `fg`                                       | `#d5dde5`     | `--bbg-text`   |
-| `primary`                                  | `#ff9e1b`     | `--bbg-amber`  |
-| `secondary`                                | `#8b95a1`     | `--bbg-dim`    |
+| `primary`                                  | `#00d9ff`     | `--bbg-cyan`   |
+| `secondary`                                | `#ff9e1b`     | `--bbg-amber`  |
 | `success`                                  | `#2ecc71`     | `--bbg-green`  |
 | `info`                                     | `#4ea1ff`     | `--bbg-cyan`   |
-| `warning`                                  | `#ff6a1a`     | `--bbg-orange` |
+| `warning`                                  | `#ff9e1b`     | `--bbg-amber`  |
 | `danger`                                   | `#ff4d4f`     | `--bbg-red`    |
 | `base_font` / `heading_font` / `code_font` | IBM Plex Mono | `--bbg-mono`   |
 
