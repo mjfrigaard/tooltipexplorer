@@ -16,10 +16,7 @@ knitr::opts_chunk$set(
 
 # tooltipexplorer
 
-**tooltipexplorer** is a Shiny application-package for demoing and comparing
-five tooltip and hover-info approaches in R, powered by real financial data
-from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and
-[tidyquant](https://business-science.github.io/tidyquant/).
+**`tooltipexplorer`** is a Shiny application-package for demoing and comparing five tooltip and hover-info approaches in R, powered by real financial data from [Tidy Finance](https://www.tidy-finance.org/r/) (`tidyfinance`) and [tidyquant](https://business-science.github.io/tidyquant/).
 
 ## Installation
 
@@ -41,13 +38,12 @@ library(tooltipexplorer)
 launch()
 ```
 
-Use the sidebar to select tickers and a date range, then click **Fetch data**.
-Each of the five tabs demonstrates a different tooltip or hover-info approach.
+Use the sidebar to select tickers and a date range, then click **Fetch data**. Each of the five tabs demonstrates a different tooltip or hover-info approach.
 
 ## Tooltip back-ends
 
 | Tab | Package | Interaction | Helper |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | **bslib** | `bslib::popover()` | Click | `mod_tooltip(type = "bslib")` |
 | **shinyhelper** | `shinyhelper::helper()` | Click | `mod_tooltip(type = "shinyhelper")` |
 | **prompter** | `prompter::add_prompt()` | Hover | `mod_tooltip(type = "prompter")` |
@@ -56,8 +52,7 @@ Each of the five tabs demonstrates a different tooltip or hover-info approach.
 
 ## Data utilities
 
-The package exports a small set of financial data helpers you can use outside
-Shiny:
+The package exports a small set of financial data helpers you can use outside Shiny:
 
 ```{r data-utils}
 prices  <- get_stock_prices(c("AAPL", "MSFT"), from = "2024-01-01")
@@ -109,7 +104,7 @@ reactable::colDef(
 
 ## Logging
 
-All modules use the `logger` package.  Set the threshold once at session start:
+All modules use the `logger` package. Set the threshold once at session start:
 
 ```{r logging}
 app_set_log_threshold(logger::DEBUG)  # verbose (development)
@@ -118,5 +113,4 @@ app_set_log_threshold(logger::WARN)   # quiet   (production)
 
 ## Learn more
 
-See `vignette("tooltips-hover-info", package = "tooltipexplorer")` for a full
-walkthrough of the app architecture, module API, and each tooltip back-end.
+See `vignette("tooltips-hover-info", package = "tooltipexplorer")` for a full walkthrough of the app architecture, module API, and each tooltip back-end.

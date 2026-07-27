@@ -28,11 +28,11 @@ tooltipexplorer_theme <- function() {
     bg = "#0b0e13",           # Terminal background (near-black)
     fg = "#d5dde5",           # Body text
     # Semantic palette
-    primary = "#ff9e1b",      # Bloomberg amber
-    secondary = "#8b95a1",    # Muted grey
+    primary = "#00d9ff",      # Cyan
+    secondary = "#ff9e1b",    # Bloomberg amber
     success = "#2ecc71",      # Up / green
-    info = "#4ea1ff",         # Cyan
-    warning = "#ff6a1a",      # Orange
+    info = "#4ea1ff",         # Bright cyan
+    warning = "#ff9e1b",      # Amber
     danger = "#ff4d4f",       # Down / red
     # Typography (mono everywhere)
     font_family_base = mono,
@@ -48,7 +48,7 @@ tooltipexplorer_theme <- function() {
     "card-cap-bg" = "#1a1f28",
     "card-border-color" = "#2a313b",
     # Links
-    link_color = "#4ea1ff",
-    link_hover_color = "#ffbf57"
+    link_color = "#ff9e1b",
+    link_hover_color = "#00d9ff"
   )
 }

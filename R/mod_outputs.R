@@ -221,7 +221,7 @@ mod_outputs_server <- function(id, inputs_r) {
             row    <- df[i, ]
             sharpe <- round(row$sharpe, 2)
             theme  <- if (sharpe >= 1) {
-              bslib::value_box_theme(bg = "#ff9e1b", fg = "#05070a")
+              bslib::value_box_theme(bg = "#00d9ff", fg = "#0b0e13")
             } else if (sharpe >= 0) {
               "warning"
             } else {

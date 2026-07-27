@@ -1,7 +1,7 @@
 url: https://mjfrigaard.github.io/tooltipexplorer/
 
 navbar:
-  bg: primary       # paint the bar with primary (Bloomberg amber)
+  bg: primary       # paint the bar with primary (Cyan)
   type: dark        # light text for contrast on dark background
   structure:
     left: [intro, reference, articles]
@@ -12,8 +12,8 @@ template:
   bslib:
     bg: "#0b0e13"          # Terminal background (near-black)
     fg: "#d5dde5"          # Body text (light grey)
-    primary:   "#ff9e1b"   # Bloomberg amber       — buttons, headings, links
-    secondary: "#00d9ff"   # Cyan                  — hover, secondary accents
+    primary:   "#00d9ff"   # Cyan                  — buttons, headings, links
+    secondary: "#ff9e1b"   # Bloomberg amber       — hover, secondary accents
     success:   "#2ecc71"   # Green                 — success, gains
     info:      "#4ea1ff"   # Bright cyan           — info accents
     warning:   "#ff9e1b"   # Bloomberg amber       — warning accent
@@ -21,7 +21,7 @@ template:
     body-bg:   "#0b0e13"   # Dark background
     body-color: "#d5dde5"  # Light text
     border-color: "#2a313b" # Dark borders
-    code-color: "#00d9ff"  # Cyan for inline code
+    code-color: "#ff9e1b"  # Amber for inline code
     code-bg:    "#12161d"  # Dark code background
     base_font:
       google: "Ubuntu"
@@ -38,9 +38,10 @@ articles:
   - title: "Deep dives"
     navbar: ~
     contents:
-      - modules
+      - design
+      - implementation
+      - structure
       - theme
-      - logger-namespaces
 
 reference:
   - title: "App"

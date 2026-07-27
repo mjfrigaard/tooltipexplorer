@@ -1,0 +1,107 @@
+---
+title: "Design"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Design}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tooltipexplorer)
+```
+
+## Design Patterns
+
+This vignette covers the design patterns used to build the modules in `tooltipexplorer`.
+
+### 1. Function-Based Module Pattern
+
+Each module is a pair of functions, `mod_<name>_ui()` and `mod_<name>_server()`, co-located in a single `R/mod_<name>.R` file. The UI function returns a Shiny tag object; the server function wraps its logic in `shiny::moduleServer()`.
+
+``` r
+inputs_r <- mod_inputs_server("inputs")
+
+bslib::page_sidebar(
+  sidebar = mod_inputs_ui("inputs"),
+  mod_outputs_ui("outputs")
+)
+```
+
+There is no persistent object between the UI call and the server call — the pairing is a naming convention, not an enforced binding.
+
+### 2. Namespace Creation via `shiny::NS()`
+
+Each function calls `shiny::NS(id)` independently:
+
+``` r
+mod_inputs_ui <- function(id) {
+  ns <- shiny::NS(id)  # created in the UI function
+  shiny::selectizeInput(inputId = ns("tickers"), ...)
+}
+
+mod_inputs_server <- function(id) {
+  shiny::moduleServer(id, function(input, output, session) {
+    input$tickers  # namespaced automatically by moduleServer()
+  })
+}
+```
+
+The same `id` string must be passed to both the UI and server calls in `app_ui()` / `app_server()` for the namespaces to line up — there is no shared object enforcing this, so the discipline is naming-convention only (`mod_inputs_ui("inputs")` pairs with `mod_inputs_server("inputs")`).
+
+### 3. Reactive Dependency Injection via Function Arguments
+
+Downstream modules receive upstream reactives as ordinary function arguments:
+
+``` r
+# in app_server
+inputs_r <- mod_inputs_server("inputs")
+perf_r   <- mod_outputs_server("outputs", inputs_r = inputs_r)
+           mod_download_server("download", inputs_r = inputs_r, perf_r = perf_r)
+```
+
+Each module's dependencies are visible directly in its function signature, which makes the top-down reactive flow explicit and easy to trace from `app_server()` alone.
+
+### 4. Reactive Composition Inside `moduleServer()`
+
+Inside `mod_outputs_server()`, a chain of local reactives builds up the performance pipeline step by step:
+
+``` r
+prices_r <- shiny::eventReactive(inputs_r()$fetch, {
+  get_stock_prices(tickers = inp$tickers, from = inp$from, to = inp$to)
+})
+
+returns_r <- shiny::reactive({
+  get_stock_returns(prices_r())
+})
+
+perf_r <- shiny::reactive({
+  summarise_performance(returns_r())
+})
+```
+
+Each reactive depends only on the one before it, so the pipeline can be reasoned about (and tested) one stage at a time.
+
+### 5. Logging with Namespace Isolation
+
+Every `logger::log_*()` call carries an explicit `namespace` string scoped to its module:
+
+``` r
+logger::log_info(
+  "Fetch button pressed | tickers: [{paste(input$tickers, collapse = ', ')}]",
+  namespace = "tooltipexplorer/inputs"
+)
+
+# Filter by namespace in development
+app_set_log_threshold(logger::DEBUG)                                    # all namespaces
+logger::log_threshold(logger::DEBUG, namespace = "tooltipexplorer/outputs")  # one namespace
+```
+
+This makes it possible to silence noisy modules while debugging a specific one. See `vignette("implementation")` for the full namespace table and log-level reference.
