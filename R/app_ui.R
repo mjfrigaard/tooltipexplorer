@@ -92,6 +92,16 @@ app_ui <- function() {
             )
           ),
           shiny::tags$div(
+            shiny::tags$b(
+              shiny::code("reactiveValuesToList"),
+            shiny::verbatimTextOutput(outputId = "vals")
+            ),
+            shiny::tags$b(
+              shiny::code("inputs_r()"),
+              shiny::verbatimTextOutput(outputId = "dev")
+            )
+          ),
+          shiny::tags$div(
             shiny::tags$strong("Packages: "),
             shiny::tags$span(
               shiny::tags$b("bslib"),        " (popover), ",

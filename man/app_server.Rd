@@ -13,6 +13,6 @@ app_server(input, output, session)
 Nothing (called for side-effects).
 }
 \description{
-Top-level server function that initialises all module servers and wires
+Top-level server function that initializes all module servers and wires
 reactive values between them.
 }
